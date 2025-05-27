@@ -1,0 +1,4479 @@
+# Assignment #1: 虚拟机，Shell & 大语言模型
+
+Updated 2309 GMT+8 Feb 20, 2025
+
+2025 spring, Complied by <mark>陈宣之 生命科学学院</mark>
+
+
+
+**作业的各项评分细则及对应的得分**
+
+| 标准                                 | 等级                                                         | 得分 |
+| ------------------------------------ | ------------------------------------------------------------ | ---- |
+| 按时提交                             | 完全按时提交：1分<br/>提交有请假说明：0.5分<br/>未提交：0分  | 1 分 |
+| 源码、耗时（可选）、解题思路（可选） | 提交了4个或更多题目且包含所有必要信息：1分<br/>提交了2个或以上题目但不足4个：0.5分<br/>少于2个：0分 | 1 分 |
+| AC代码截图                           | 提交了4个或更多题目且包含所有必要信息：1分<br/>提交了2个或以上题目但不足4个：0.5分<br/>少于：0分 | 1 分 |
+| 清晰头像、PDF文件、MD/DOC附件        | 包含清晰的Canvas头像、PDF文件以及MD或DOC格式的附件：1分<br/>缺少上述三项中的任意一项：0.5分<br/>缺失两项或以上：0分 | 1 分 |
+| 学习总结和个人收获                   | 提交了学习总结和个人收获：1分<br/>未提交学习总结或内容不详：0分 | 1 分 |
+| 总得分： 5                           | 总分满分：5分                                                |      |
+
+>
+>
+>
+>**说明：**
+>
+>1. **解题与记录：**
+>   - 对于每一个题目，请提供其解题思路（可选），并附上使用Python或C++编写的源代码（确保已在OpenJudge， Codeforces，LeetCode等平台上获得Accepted）。请将这些信息连同显示“Accepted”的截图一起填写到下方的作业模板中。（推荐使用Typora https://typoraio.cn 进行编辑，当然你也可以选择Word。）无论题目是否已通过，请标明每个题目大致花费的时间。
+>
+>2. **课程平台与提交安排：**
+>
+>  - 我们的课程网站位于Canvas平台（https://pku.instructure.com ）。该平台将在第2周选课结束后正式启用。在平台启用前，请先完成作业并将作业妥善保存。待Canvas平台激活后，再上传你的作业。
+>
+>    - 提交时，请首先上传PDF格式的文件，并将.md或.doc格式的文件作为附件上传至右侧的“作业评论”区。确保你的Canvas账户有一个清晰可见的头像，提交的文件为PDF格式，并且“作业评论”区包含上传的.md或.doc附件。
+>
+>3. **延迟提交：**
+>
+>  - 如果你预计无法在截止日期前提交作业，请提前告知具体原因。这有助于我们了解情况并可能为你提供适当的延期或其他帮助。 
+>
+>请按照上述指导认真准备和提交作业，以保证顺利完成课程要求。
+
+
+
+## 1. 题目
+
+### 27653: Fraction类
+
+http://cs101.openjudge.cn/practice/27653/
+
+
+
+思路：还不太会OOP，先抄抄答案
+
+
+
+代码：
+
+```python
+def gcd(m, n):
+    while m % n != 0:
+        oldm = m
+        oldn = n
+        m = oldn
+        n = oldm % oldn
+    return n
+
+class Fraction:
+    def __init__(self,top,bottom):
+        self.num = top
+        self.den = bottom
+    def __str__(self):
+        return str(self.num) + "/" + str(self.den)
+
+    def __add__(self,other):
+        new_num = self.num * other.den + self.den * other.num
+        new_den = self.den * other.den
+        common = gcd(new_num,new_den)
+        return Fraction(new_num//common,new_den//common)
+
+a,b,c,d = map(int,input().split())
+frac1 = Fraction(a,b)
+frac2 = Fraction(c,d)
+result = frac1 + frac2
+print(result)
+```
+
+
+
+代码运行截图 <mark>（至少包含有"Accepted"）</mark>
+
+![image-20250304185944086](C:\Users\20157\AppData\Roaming\Typora\typora-user-images\image-20250304185944086.png)
+
+
+
+### 1760.袋子里最少数目的球
+
+ https://leetcode.cn/problems/minimum-limit-of-balls-in-a-bag/
+
+
+
+
+思路：二分查找最小可能的数，判断是否可行
+
+
+
+代码：
+
+```python
+class Solution:
+    def minimumSize(self, nums: List[int], maxOperations: int) -> int:
+        nums.sort()
+        lo=1
+        hi=nums[-1]
+        while lo<=hi:
+            mid=(lo+hi)//2
+            cnt=sum((i-1)//mid for i in nums)
+            if cnt<=maxOperations:
+                hi=mid-1
+            else:
+                lo=mid+1
+        return lo
+```
+
+
+
+代码运行截图 <mark>（至少包含有"Accepted"）</mark>
+
+
+
+![image-20250304190202497](C:\Users\20157\AppData\Roaming\Typora\typora-user-images\image-20250304190202497.png)
+
+
+
+### 04135: 月度开销
+
+http://cs101.openjudge.cn/practice/04135
+
+
+
+思路：同样二分查找
+
+
+
+代码：
+
+```python
+def judge(lst,ref,limit):
+    cnt=0
+    temp=0
+    for j in lst:
+        if temp+j<=ref:
+            temp+=j
+        else:
+            cnt+=1
+            temp=j
+    cnt+=1
+    if cnt<=limit:
+        return True
+    else:
+        return False
+
+
+n,m=map(int,input().split())
+days=[]
+for i in range(n):
+    days.append(int(input()))
+hi=sum(days)
+lo=max(days)
+while lo<=hi:
+    mid=(lo+hi)//2
+    if judge(days,mid,m):
+        hi=mid-1
+    else:
+        lo=mid+1
+print(lo)
+
+```
+
+
+
+代码运行截图 <mark>（至少包含有"Accepted"）</mark>
+
+![image-20250304192737731](C:\Users\20157\AppData\Roaming\Typora\typora-user-images\image-20250304192737731.png)
+
+
+
+### 27300: 模型整理
+
+http://cs101.openjudge.cn/practice/27300/
+
+
+
+思路：用defaltdict，以模型名为key，以后缀+表示的具体值为value，先对key排序，输出时再对value中具体值排序，输出后缀
+
+
+
+代码：
+
+```python
+from collections import defaultdict
+n=int(input())
+model=defaultdict(list)
+for i in range(n):
+    obj=input().split("-")
+    model[obj[0]].append([obj[1],float(obj[1][:-1])*(1e6 if obj[1][-1]=="M" else 1e9)])
+model=sorted(model.items())
+for i in model:
+    i[1].sort(key=lambda x: x[1])
+    print(i[0]+":",i[1][0][0],end="")
+    for j in i[1][1:]:
+        print(",",j[0],end="")
+    print()
+```
+
+
+
+代码运行截图 <mark>（至少包含有"Accepted"）</mark>
+
+![image-20250305134219278](C:\Users\20157\AppData\Roaming\Typora\typora-user-images\image-20250305134219278.png)
+
+
+
+### Q5. 大语言模型（LLM）部署与测试
+
+本任务旨在本地环境或通过云虚拟机（如 https://clab.pku.edu.cn/ 提供的资源）部署大语言模型（LLM）并进行测试。用户界面方面，可以选择使用图形界面工具如 https://lmstudio.ai 或命令行界面如 https://www.ollama.com 来完成部署工作。
+
+测试内容包括选择若干编程题目，确保这些题目能够在所部署的LLM上得到正确解答，并通过所有相关的测试用例（即状态为Accepted）。选题应来源于在线判题平台，例如 OpenJudge、Codeforces、LeetCode 或洛谷等，同时需注意避免与已找到的AI接受题目重复。已有的AI接受题目列表可参考以下链接：
+https://github.com/GMyhf/2025spring-cs201/blob/main/AI_accepted_locally.md
+
+请提供你的最新进展情况，包括任何关键步骤的截图以及遇到的问题和解决方案。这将有助于全面了解项目的推进状态，并为进一步的工作提供参考。
+
+
+
+
+
+### Q6. 阅读《Build a Large Language Model (From Scratch)》第一章
+
+作者：Sebastian Raschka
+
+请整理你的学习笔记。这应该包括但不限于对第一章核心概念的理解、重要术语的解释、你认为特别有趣或具有挑战性的内容，以及任何你可能有的疑问或反思。通过这种方式，不仅能巩固你自己的学习成果，也能帮助他人更好地理解这一部分内容。
+
+
+
+
+
+## 2. 学习总结和个人收获
+
+<mark>如果发现作业题目相对简单，有否寻找额外的练习题目，如“数算2025spring每日选做”、LeetCode、Codeforces、洛谷等网站上的题目。</mark>
+
+电脑文盲听不懂第一节课，遂放弃
+
+还是不太理解OOP的逻辑，得花点时间研究一下相关的基本知识
+
+模型查找开始没读懂题，以为就两种模型，同学提醒后用defaltdict还挺方便的
+
+
+# Assignment #2: 深度学习与大语言模型
+
+Updated 2204 GMT+8 Feb 25, 2025
+
+2025 spring, Complied by <mark>陈宣之 生命科学学院</mark>
+
+
+
+**作业的各项评分细则及对应的得分**
+
+| 标准                                 | 等级                                                         | 得分 |
+| ------------------------------------ | ------------------------------------------------------------ | ---- |
+| 按时提交                             | 完全按时提交：1分<br/>提交有请假说明：0.5分<br/>未提交：0分  | 1 分 |
+| 源码、耗时（可选）、解题思路（可选） | 提交了4个或更多题目且包含所有必要信息：1分<br/>提交了2个或以上题目但不足4个：0.5分<br/>少于2个：0分 | 1 分 |
+| AC代码截图                           | 提交了4个或更多题目且包含所有必要信息：1分<br/>提交了2个或以上题目但不足4个：0.5分<br/>少于：0分 | 1 分 |
+| 清晰头像、PDF文件、MD/DOC附件        | 包含清晰的Canvas头像、PDF文件以及MD或DOC格式的附件：1分<br/>缺少上述三项中的任意一项：0.5分<br/>缺失两项或以上：0分 | 1 分 |
+| 学习总结和个人收获                   | 提交了学习总结和个人收获：1分<br/>未提交学习总结或内容不详：0分 | 1 分 |
+| 总得分： 5                           | 总分满分：5分                                                |      |
+
+>
+>
+>
+>**说明：**
+>
+>1. **解题与记录：**
+>   - 对于每一个题目，请提供其解题思路（可选），并附上使用Python或C++编写的源代码（确保已在OpenJudge， Codeforces，LeetCode等平台上获得Accepted）。请将这些信息连同显示“Accepted”的截图一起填写到下方的作业模板中。（推荐使用Typora https://typoraio.cn 进行编辑，当然你也可以选择Word。）无论题目是否已通过，请标明每个题目大致花费的时间。
+>
+>2. **课程平台与提交安排：**
+>
+>  - 我们的课程网站位于Canvas平台（https://pku.instructure.com ）。该平台将在第2周选课结束后正式启用。在平台启用前，请先完成作业并将作业妥善保存。待Canvas平台激活后，再上传你的作业。
+>
+>    - 提交时，请首先上传PDF格式的文件，并将.md或.doc格式的文件作为附件上传至右侧的“作业评论”区。确保你的Canvas账户有一个清晰可见的头像，提交的文件为PDF格式，并且“作业评论”区包含上传的.md或.doc附件。
+>
+>3. **延迟提交：**
+>
+>  - 如果你预计无法在截止日期前提交作业，请提前告知具体原因。这有助于我们了解情况并可能为你提供适当的延期或其他帮助。 
+>
+>请按照上述指导认真准备和提交作业，以保证顺利完成课程要求。
+
+
+
+## 1. 题目
+
+### 18161: 矩阵运算
+
+matrices, http://cs101.openjudge.cn/practice/18161
+
+
+
+思路：简单的矩阵运算
+
+
+
+代码：
+
+```python
+matrix1,matrix2,matrix3=[],[],[]
+n1,m1=map(int,input().split())
+for i in range(n1):
+    matrix1.append(list(map(int,input().split())))
+n2,m2=map(int,input().split())
+for i in range(n2):
+    matrix2.append(list(map(int,input().split())))
+n3,m3=map(int,input().split())
+for i in range(n3):
+    matrix3.append(list(map(int,input().split())))
+if n1!=n3 or m2!=m3 or m1!=n2:
+    print("Error!")
+else:
+    ans=[[0]*m2 for i in range(n1)]
+    for i in range(n1):
+        for j in range(m2):
+            ans[i][j]=sum(matrix1[i][k]*matrix2[k][j] for k in range(m1))
+    for i in range(n3):
+        for j in range(m3):
+            ans[i][j]+=matrix3[i][j]
+    for i in range(n3):
+        print(*ans[i])
+```
+
+
+
+代码运行截图 <mark>（至少包含有"Accepted"）</mark>
+
+![image-20250305141732407](C:\Users\20157\AppData\Roaming\Typora\typora-user-images\image-20250305141732407.png)
+
+
+
+### 19942: 二维矩阵上的卷积运算
+
+matrices, http://cs101.openjudge.cn/practice/19942/
+
+
+
+
+思路：简单的矩阵运算
+
+
+
+代码：
+
+```python
+n,m,p,q=map(int,input().split())
+the_matrix=[]
+the_core=[]
+for i in range(n):
+    the_matrix.append(list(map(int,input().split())))
+for i in range(p):
+    the_core.append(list(map(int,input().split())))
+for i in range(n+1-p):
+    line=[]
+    for j in range(m+1-q):
+        output=0
+        for k in range(p):
+            for l in range(q):
+                output+=the_matrix[i+k][j+l]*the_core[k][l]
+        line.append(output)
+    print(" ".join(map(str,line)))
+```
+
+
+
+代码运行截图 <mark>（至少包含有"Accepted"）</mark>
+
+![image-20250305142002209](C:\Users\20157\AppData\Roaming\Typora\typora-user-images\image-20250305142002209.png)
+
+
+
+### 04140: 方程求解
+
+牛顿迭代法，http://cs101.openjudge.cn/practice/04140/
+
+请用<mark>牛顿迭代法</mark>实现。
+
+因为大语言模型的训练过程中涉及到了梯度下降（或其变种，如SGD、Adam等），用于优化模型参数以最小化损失函数。两种方法都是通过迭代的方式逐步接近最优解。每一次迭代都基于当前点的局部信息调整参数，试图找到一个比当前点更优的新点。理解牛顿迭代法有助于深入理解基于梯度的优化算法的工作原理，特别是它们如何利用导数信息进行决策。
+
+> **牛顿迭代法**
+>
+> - **目的**：主要用于寻找一个函数 $f(x)$ 的根，即找到满足 $f(x)=0$ 的 $x$ 值。不过，通过适当变换目标函数，它也可以用于寻找函数的极值。
+> - **方法基础**：利用泰勒级数的一阶和二阶项来近似目标函数，在每次迭代中使用目标函数及其导数的信息来计算下一步的方向和步长。
+> - **迭代公式**：$ x_{n+1} = x_n - \frac{f(x_n)}{f'(x_n)} $ 对于求极值问题，这可以转化为$ x_{n+1} = x_n - \frac{f'(x_n)}{f''(x_n)} $，这里 $f'(x)$ 和 $f''(x)$ 分别是目标函数的一阶导数和二阶导数。
+> - **特点**：牛顿法通常具有更快的收敛速度（尤其是对于二次可微函数），但是需要计算目标函数的二阶导数（Hessian矩阵在多维情况下），并且对初始点的选择较为敏感。
+>
+> **梯度下降法**
+>
+> - **目的**：直接用于寻找函数的最小值（也可以通过取负寻找最大值），尤其在机器学习领域应用广泛。
+> - **方法基础**：仅依赖于目标函数的一阶导数信息（即梯度），沿着梯度的反方向移动以达到减少函数值的目的。
+> - **迭代公式**：$ x_{n+1} = x_n - \alpha \cdot \nabla f(x_n) $ 这里 $\alpha$ 是学习率，$\nabla f(x_n)$ 表示目标函数在 $x_n$ 点的梯度。
+> - **特点**：梯度下降不需要计算复杂的二阶导数，因此在高维空间中相对容易实现。然而，它的收敛速度通常较慢，特别是当目标函数的等高线呈现出椭圆而非圆形时（即存在条件数大的情况）。
+>
+> **相同与不同**
+>
+> - **相同点**：两者都可用于优化问题，试图找到函数的极小值点；都需要目标函数至少一阶可导。
+> - **不同点**：
+>   - 牛顿法使用了更多的局部信息（即二阶导数），因此理论上收敛速度更快，但在实际应用中可能会遇到计算成本高、难以处理大规模数据集等问题。
+>   - 梯度下降则更为简单，易于实现，特别是在高维空间中，但由于只使用了一阶导数信息，其收敛速度可能较慢，尤其是在接近极值点时。
+
+
+
+代码：
+
+```python
+x=0
+while abs(x**3-5*x**2+10*x-80)>1e-9:
+    x=x-(x**3-5*x**2+10*x-80)/(3*x**2-10*x+10)
+print("%.9f" % x)
+```
+
+
+
+代码运行截图 <mark>（至少包含有"Accepted"）</mark>
+
+![image-20250310213248480](C:\Users\20157\AppData\Roaming\Typora\typora-user-images\image-20250310213248480.png)
+
+
+
+### 06640: 倒排索引
+
+data structures, http://cs101.openjudge.cn/practice/06640/
+
+
+
+思路：每个文档单词存成集合，查询的时候遍历每个文档
+
+
+
+代码：
+
+```python
+n=int(input())
+doc=[]
+for i in range(n):
+    tempset=set(list(input().split())[1:])
+    doc.append(tempset)
+m=int(input())
+for i in range(m):
+    temp=input()
+    ans=[]
+    for j in range(n):
+        if temp in doc[j]:
+            ans.append(j+1)
+    if len(ans)==0:
+        print("NOT FOUND")
+    else:
+        print(*ans)
+```
+
+
+
+代码运行截图 <mark>（至少包含有"Accepted"）</mark>
+
+![image-20250310220530714](C:\Users\20157\AppData\Roaming\Typora\typora-user-images\image-20250310220530714.png)
+
+
+
+### 04093: 倒排索引查询
+
+data structures, http://cs101.openjudge.cn/practice/04093/
+
+
+
+思路：将单词编号，用defaltdict存储，键为文档编号，值为集合存储单词编号，查询时遍历每个键看是否满足条件，满足存入ans列表
+
+
+
+代码：
+
+```python
+from collections import defaultdict
+n=int(input())
+docs=defaultdict(set)
+for i in range(n):
+    temp=list(map(int,input().split()))
+    for j in range(1,len(temp)):
+        docs[temp[j]].add(i+1)
+m=int(input())
+for i in range(m):
+    temp=list(map(int,input().split()))
+    ans=[]
+    for j in docs.keys():
+        judge=True
+        for k in range(1,len(temp)+1):
+            if temp[k-1]==1:
+                if k not in docs[j]:
+                    judge=False
+                    break
+            elif temp[k-1]==-1:
+                if k in docs[j]:
+                    judge=False
+                    break
+            else:
+                continue
+        if judge:
+            ans.append(j)
+    ans.sort()
+    if len(ans)==0:
+        print("NOT FOUND")
+    else:
+        print(*ans)
+```
+
+
+
+代码运行截图 <mark>（至少包含有"Accepted"）</mark>
+
+
+
+
+
+### Q6. Neural Network实现鸢尾花卉数据分类
+
+在http://clab.pku.edu.cn 云端虚拟机，用Neural Network实现鸢尾花卉数据分类。
+
+参考链接，https://github.com/GMyhf/2025spring-cs201/blob/main/LLM/iris_neural_network.md
+
+
+
+
+
+## 2. 学习总结和个人收获
+
+<mark>如果发现作业题目相对简单，有否寻找额外的练习题目，如“数算2025spring每日选做”、LeetCode、Codeforces、洛谷等网站上的题目。</mark>
+
+这学期课业比较繁重，LLM相关内容没有太花心思，Linux相关内容后来生信实验也有涉及，数算课程上了解一些后实际操作感觉顺手很多。作业题暂时没遇上什么困难，上学期计概学习卓有成效呀（喜）。最近没什么时间写每日一练，希望之后能有精力补上吧（悲）。
+
+
+
+# Assignment #3: 惊蛰 Mock Exam
+
+Updated 1641 GMT+8 Mar 5, 2025
+
+2025 spring, Complied by 陈宣之 生命科学学院 <mark>同学的姓名、院系</mark>
+
+
+
+> **说明：**
+>
+> 1. **惊蛰⽉考**：AC4<mark>（请改为同学的通过数）</mark> 。考试题⽬都在“题库（包括计概、数算题目）”⾥⾯，按照数字题号能找到，可以重新提交。作业中提交⾃⼰最满意版本的代码和截图。
+>
+> 2. **解题与记录：**
+>
+>    对于每一个题目，请提供其解题思路（可选），并附上使用Python或C++编写的源代码（确保已在OpenJudge， Codeforces，LeetCode等平台上获得Accepted）。请将这些信息连同显示“Accepted”的截图一起填写到下方的作业模板中。（推荐使用Typora https://typoraio.cn 进行编辑，当然你也可以选择Word。）无论题目是否已通过，请标明每个题目大致花费的时间。
+>
+> 3. **提交安排：**提交时，请首先上传PDF格式的文件，并将.md或.doc格式的文件作为附件上传至右侧的“作业评论”区。确保你的Canvas账户有一个清晰可见的头像，提交的文件为PDF格式，并且“作业评论”区包含上传的.md或.doc附件。
+>
+> 4. **延迟提交：**如果你预计无法在截止日期前提交作业，请提前告知具体原因。这有助于我们了解情况并可能为你提供适当的延期或其他帮助。 
+>
+> 请按照上述指导认真准备和提交作业，以保证顺利完成课程要求。
+
+
+
+## 1. 题目
+
+### E04015: 邮箱验证
+
+strings, http://cs101.openjudge.cn/practice/04015
+
+
+
+思路：排除首位与相连的情况，然后扫描计数@，判断之后出现.并且计数为1
+
+
+
+代码：
+
+```python
+while True:
+    try:
+        mail=input()
+        if mail[0]=="@" or mail[-1]=="@" or mail[0]=="." or mail[-1]=="." or ".@" in mail or "@." in mail:
+            print("NO")
+            continue
+        cnt=0
+        judge=False
+        for i in mail:
+            if i=="@":
+                cnt+=1
+            if i=="." and cnt==1:
+                judge=True
+        if cnt==1 and judge==True:
+            print("YES")
+        else:
+            print("NO")
+
+    except EOFError:
+        break
+```
+
+
+
+代码运行截图 <mark>（至少包含有"Accepted"）</mark>
+
+![image-20250310225832653](C:\Users\20157\AppData\Roaming\Typora\typora-user-images\image-20250310225832653.png)
+
+
+
+### M02039: 反反复复
+
+implementation, http://cs101.openjudge.cn/practice/02039/
+
+
+
+思路：point指针，dire设置方向存入matrix，再竖着输出
+
+
+
+代码：
+
+```python
+m=int(input())
+info=input()
+matrix=[]
+point=m
+dire=1
+while point<=len(info):
+    if dire==1:
+        matrix.append(info[point-m:point])
+    else:
+        matrix.append(info[point-1:point-m-1:-1])
+    point+=m
+    dire*=(-1)
+for i in range(m):
+    for j in range(len(matrix)):
+        print(matrix[j][i],end="")
+```
+
+
+
+代码运行截图 <mark>（至少包含有"Accepted"）</mark>
+
+![image-20250310230020587](C:\Users\20157\AppData\Roaming\Typora\typora-user-images\image-20250310230020587.png)
+
+
+
+### M02092: Grandpa is Famous
+
+implementation, http://cs101.openjudge.cn/practice/02092/
+
+
+
+思路：用defaltdict，键为身份序号，值计数，按值倒序排列items，找到第二的值no2，再找值为no2的键，正序输出
+
+
+
+代码：
+
+```python
+from collections import defaultdict
+while True:
+    n,m=map(int,input().split())
+    if n==0 and m==0:
+        break
+    else:
+        rank=defaultdict(int)
+        for i in range(n):
+            lst=list(map(int,input().split()))
+            for i in lst:
+                rank[i]+=1
+        rank=sorted(rank.items(),key=lambda x:x[1],reverse=True)
+        no1,no2=rank[0][1],0
+        ans=[]
+        for i in rank:
+            if i[1]<no1:
+                no2=i[1]
+                break
+        for i in rank:
+            if i[1]==no2:
+                ans.append(i[0])
+            if i[1]<no2:
+                break
+        ans.sort()
+        print(*ans)
+```
+
+
+
+代码运行截图 <mark>（至少包含有"Accepted"）</mark>
+
+![image-20250310230422886](C:\Users\20157\AppData\Roaming\Typora\typora-user-images\image-20250310230422886.png)
+
+
+
+### M04133: 垃圾炸弹
+
+matrices, http://cs101.openjudge.cn/practice/04133/
+
+
+
+思路：遍历每个点维护最大值
+
+
+
+代码：
+
+```python
+d=int(input())
+n=int(input())
+rub=[]
+for i in range(n):
+    rub.append(list(map(int,input().split())))
+ans=0
+cnt=0
+for i in range(1025):
+    for j in range(1025):
+        temp=0
+        for scan in rub:
+            if abs(scan[0]-i)<=d and abs(scan[1]-j)<=d:
+                temp+=scan[2]
+        if temp>ans:
+            ans=temp
+            cnt=1
+        elif temp==ans:
+            cnt+=1
+print(cnt,ans)
+```
+
+
+
+代码运行截图 <mark>（至少包含有"Accepted"）</mark>
+
+![image-20250310230517260](C:\Users\20157\AppData\Roaming\Typora\typora-user-images\image-20250310230517260.png)
+
+
+
+### T02488: A Knight's Journey
+
+backtracking, http://cs101.openjudge.cn/practice/02488/
+
+
+
+思路：Dijstra，把路径放在第一位，用heapq取字典序最小
+
+
+
+代码：
+
+```python
+import heapq
+def dfs(x,y,r,c):
+    global table,directions
+    q=[[table[x][y],(x,y)]]
+    while q:
+        way,(x,y)=heapq.heappop(q)
+        if len(way)==r*c*2:
+            return way
+        for dx,dy in directions:
+            nx,ny=x+dx,y+dy
+            if 0<=nx<r and 0<=ny<c and table[nx][ny] not in way:
+                heapq.heappush(q,[way+table[nx][ny],(nx,ny)])
+    return 0
+
+
+n=int(input())
+directions=[(-2,-1),(-2,1),(-1,2),(-1,-2),(1,-2),(1,2),(2,-1),(2,1)]
+for _ in range(n):
+    p,q=map(int,input().split())
+    table=[]
+    for i in range(p):
+        temp=[]
+        for j in range(q):
+            temp.append(chr(ord("A")+j)+str(i+1))
+        table.append(temp)
+    judge=False
+    for j in range(q):
+        for i in range(p):
+            if dfs(i,j,p,q):
+                judge=True
+                print("Scenario #",_+1,":",sep="")
+                print(dfs(i,j,p,q))
+                break
+        if judge:
+            break
+    if not judge:
+        print("Scenario #",_+1,":",sep="")
+        print("impossible")
+    if _<n-1:
+        print()
+```
+
+
+
+代码运行截图 <mark>（至少包含有"Accepted"）</mark>
+
+![image-20250310230752263](C:\Users\20157\AppData\Roaming\Typora\typora-user-images\image-20250310230752263.png)
+
+
+
+### T06648: Sequence
+
+heap, http://cs101.openjudge.cn/practice/06648/
+
+
+
+思路：输入时将各条序列sort，先只考虑两条序列，（0,0）一定最小，用heapq存储，下一步最小一定在（i+1, j）和（i, j+1）之间，以此类推找到最小的n个存为序列seq，再将seq与第三条序列重复操作，以此类推。注意m=1的情况。
+
+
+
+代码：
+
+```python
+import heapq
+def step(seq1,seq2):
+    global n,m
+    res=[]
+    q=[(seq1[0]+seq2[0],0,0)]
+    inq=set((0,0))
+    while q and len(res)<n:
+        min_sum,seq1_idx,seq2_idx=heapq.heappop(q)
+        res.append(min_sum)
+        if seq1_idx<n-1 and (seq1_idx+1,seq2_idx) not in inq:
+            heapq.heappush(q,(seq1[seq1_idx+1]+seq2[seq2_idx],seq1_idx+1,seq2_idx))
+            inq.add((seq1_idx+1,seq2_idx))
+        if seq2_idx<n-1 and (seq1_idx,seq2_idx+1) not in inq:
+            heapq.heappush(q,(seq1[seq1_idx]+seq2[seq2_idx+1],seq1_idx,seq2_idx+1))
+            inq.add((seq1_idx,seq2_idx+1))
+    return res
+
+t=int(input())
+for i in range(t):
+    m,n=map(int,input().split())
+    sequences=[]
+    for j in range(m):
+        temp=list(map(int,input().split()))
+        temp.sort()
+        sequences.append(temp)
+    if len(sequences)<2:
+        print(*sequences[0])
+    else:
+        seq=step(sequences[0],sequences[1])
+        for j in range(2,m):
+            seq=step(seq,sequences[j])
+        print(*seq)
+```
+
+
+
+代码运行截图 ==（AC代码截图，至少包含有"Accepted"）==
+
+![image-20250311222746535](C:\Users\20157\AppData\Roaming\Typora\typora-user-images\image-20250311222746535.png)
+
+
+
+## 2. 学习总结和收获
+
+<mark>如果发现作业题目相对简单，有否寻找额外的练习题目，如“数算2025spring每日选做”、LeetCode、Codeforces、洛谷等网站上的题目。</mark>
+
+月考AC4，第五题做出来了但没来得及提交（这种情况居然真的发生了qwq），最后一题比较难，考试结束后研究了挺久的，大概知道要用heapq，复杂度压到n*m量级，但是总把m条放在一起想，导致step+1操作时的可能就不止m种了，保证最小就要回溯，那就变成遍历了，复杂度肯定要超，吃饭的时候看看微信群，知道了两条两条找就没有这个麻烦了，感觉很巧妙，从局部最优到整体最优，回去很快就解决了。
+
+
+
+# Assignment #4: 位操作、栈、链表、堆和NN
+
+Updated 1203 GMT+8 Mar 10, 2025
+
+2025 spring, Complied by <mark>陈宣之 生命科学学院</mark>
+
+
+
+> **说明：**
+>
+> 1. **解题与记录：**
+>
+>    对于每一个题目，请提供其解题思路（可选），并附上使用Python或C++编写的源代码（确保已在OpenJudge， Codeforces，LeetCode等平台上获得Accepted）。请将这些信息连同显示“Accepted”的截图一起填写到下方的作业模板中。（推荐使用Typora https://typoraio.cn 进行编辑，当然你也可以选择Word。）无论题目是否已通过，请标明每个题目大致花费的时间。
+>
+> 2. **提交安排：**提交时，请首先上传PDF格式的文件，并将.md或.doc格式的文件作为附件上传至右侧的“作业评论”区。确保你的Canvas账户有一个清晰可见的头像，提交的文件为PDF格式，并且“作业评论”区包含上传的.md或.doc附件。
+>
+> 3. **延迟提交：**如果你预计无法在截止日期前提交作业，请提前告知具体原因。这有助于我们了解情况并可能为你提供适当的延期或其他帮助。 
+>
+> 请按照上述指导认真准备和提交作业，以保证顺利完成课程要求。
+
+
+
+## 1. 题目
+
+### 136.只出现一次的数字
+
+bit manipulation, https://leetcode.cn/problems/single-number/
+
+
+
+<mark>请用位操作来实现，并且只使用常量额外空间。</mark>
+
+
+
+代码：
+
+```python
+class Solution:
+    def singleNumber(self, nums: List[int]) -> int:
+        ans=0
+        for i in nums:
+            ans^=i
+        return ans
+```
+
+
+
+代码运行截图 <mark>（至少包含有"Accepted"）</mark>
+
+![image-20250318000337078](C:\Users\20157\AppData\Roaming\Typora\typora-user-images\image-20250318000337078.png)
+
+
+
+### 20140:今日化学论文
+
+stack, http://cs101.openjudge.cn/practice/20140/
+
+
+
+思路：
+
+
+
+代码：
+
+```python
+literature=input()
+stack=[]
+for i in literature:
+    if i!="]":
+        stack.append(i)
+    else:
+        temp=[]
+        while stack[-1]!="[":
+            temp.append(stack.pop())
+        stack.pop()
+        num=[]
+        while temp and temp[-1].isdigit():
+            num.append(temp.pop())
+        num=int("".join(num))
+        temp.reverse()
+        temp=''.join(temp)
+        stack.append(temp*num)
+print(''.join(stack))
+```
+
+
+
+代码运行截图 <mark>（至少包含有"Accepted"）</mark>
+
+![image-20250318003225365](C:\Users\20157\AppData\Roaming\Typora\typora-user-images\image-20250318003225365.png)
+
+
+
+### 160.相交链表
+
+linked list, https://leetcode.cn/problems/intersection-of-two-linked-lists/
+
+
+
+思路：
+
+n*m遍历超时
+
+a，b同时分别走两条路后走对方路径，若有交点，则在交点处两指针步数相同，a=b=intersectionnode，若无交点，则在第二次走完时a=b=None
+
+代码：
+
+```python
+1.（超时）
+# Definition for singly-linked list.
+# class ListNode:
+#     def __init__(self, x):
+#         self.val = x
+#         self.next = None
+
+class Solution:
+    def getIntersectionNode(self, headA: ListNode, headB: ListNode) -> Optional[ListNode]:
+        a=headA
+        b=headB
+        ini=headB
+        while a:
+            while b:
+                if a==b:
+                    return a
+                else:
+                    b=b.next
+            b=ini
+            a=a.next
+        return None
+2.（Leecode答案）
+# Definition for singly-linked list.
+# class ListNode:
+#     def __init__(self, x):
+#         self.val = x
+#         self.next = None
+
+class Solution:
+    def getIntersectionNode(self, headA: ListNode, headB: ListNode) -> Optional[ListNode]:
+        a=headA
+        b=headB
+        while a!=b:
+            a=a.next if a else headB
+            b=b.next if b else headA
+        return a
+```
+
+
+
+代码运行截图 <mark>（至少包含有"Accepted"）</mark>
+
+![image-20250318111836474](C:\Users\20157\AppData\Roaming\Typora\typora-user-images\image-20250318111836474.png)
+
+
+
+### 206.反转链表
+
+linked list, https://leetcode.cn/problems/reverse-linked-list/
+
+
+
+思路：
+
+寒假写过的模板题
+
+代码：
+
+```python
+# Definition for singly-linked list.
+# class ListNode:
+#     def __init__(self, val=0, next=None):
+#         self.val = val
+#         self.next = next
+class Solution:
+    def reverseList(self, head: Optional[ListNode]) -> Optional[ListNode]:
+        prev=None
+        current=head
+        while current:
+            next_node=current.next
+            current.next=prev
+            prev=current
+            current=next_node
+        return prev
+```
+
+
+
+代码运行截图 <mark>（至少包含有"Accepted"）</mark>
+
+![image-20250318112001649](C:\Users\20157\AppData\Roaming\Typora\typora-user-images\image-20250318112001649.png)
+
+
+
+### 3478.选出和最大的K个元素
+
+heap, https://leetcode.cn/problems/choose-k-elements-with-maximum-sum/
+
+
+
+思路：
+
+不知道为什么一开始用了倒序，每一个i都要再扫描一遍所有j
+
+顺序扫描，先扫描的nums1一定小于等于后扫描的，q维护包括当前位置的最大的k个nums2，val维护和，若i与刚刚扫描的位置nums1相等，则ans也相等，若不相等，则ans为上一步的val
+
+代码：
+
+```python
+1.（超时）
+class Solution:
+    import heapq
+    def findMaxSum(self, nums1: List[int], nums2: List[int], k: int) -> List[int]:
+        answer=[0]*len(nums1)
+        nums1=sorted(enumerate(nums1),key=lambda x:x[1],reverse=True)
+        for i in range(len(nums1)):
+            q=[0]*k
+            for j in range(i+1,len(nums1)):
+                if nums1[j][1]<nums1[i][1]:
+                    heapq.heappush(q,-nums2[nums1[j][0]])
+                else:
+                    heapq.heappush(q,0)
+            ans=0
+            for l in range(k):
+                ans+=heapq.heappop(q)*(-1)
+            answer[nums1[i][0]]=ans
+        return answer
+2.
+class Solution:
+    import heapq
+    def findMaxSum(self, nums1: List[int], nums2: List[int], k: int) -> List[int]:
+        n=len(nums1)
+        ans=[0]*n
+        pack=sorted((x,y,idx) for idx,(x,y) in enumerate(zip(nums1,nums2)))
+        q=[]
+        val=0
+        for i,(x,y,idx) in enumerate(pack):
+            if i>=1 and x==pack[i-1][0]:
+                ans[idx]=ans[pack[i-1][2]]
+            else:
+                ans[idx]=val
+            val+=y
+            heapq.heappush(q,y)
+            if len(q)>k:
+                val-=heapq.heappop(q)
+        return ans
+```
+
+
+
+代码运行截图 <mark>（至少包含有"Accepted"）</mark>
+
+![image-20250318104728427](C:\Users\20157\AppData\Roaming\Typora\typora-user-images\image-20250318104728427.png)
+
+
+
+### Q6.交互可视化neural network
+
+https://developers.google.com/machine-learning/crash-course/neural-networks/interactive-exercises
+
+**Your task:** configure a neural network that can separate the orange dots from the blue dots in the diagram, achieving a loss of less than 0.2 on both the training and test data.
+
+**Instructions:**
+
+In the interactive widget:
+
+1. Modify the neural network hyperparameters by experimenting with some of the following config settings:
+   - Add or remove hidden layers by clicking the **+** and **-** buttons to the left of the **HIDDEN LAYERS** heading in the network diagram.
+   - Add or remove neurons from a hidden layer by clicking the **+** and **-** buttons above a hidden-layer column.
+   - Change the learning rate by choosing a new value from the **Learning rate** drop-down above the diagram.
+   - Change the activation function by choosing a new value from the **Activation** drop-down above the diagram.
+2. Click the Play button above the diagram to train the neural network model using the specified parameters.
+3. Observe the visualization of the model fitting the data as training progresses, as well as the **Test loss** and **Training loss** values in the **Output** section.
+4. If the model does not achieve loss below 0.2 on the test and training data, click reset, and repeat steps 1–3 with a different set of configuration settings. Repeat this process until you achieve the preferred results.
+
+给出满足约束条件的<mark>截图</mark>，并说明学习到的概念和原理。
+
+
+
+
+
+## 2. 学习总结和收获
+
+<mark>如果发现作业题目相对简单，有否寻找额外的练习题目，如“数算2025spring每日选做”、LeetCode、Codeforces、洛谷等网站上的题目。</mark>
+
+stack比较熟悉，heap除了Dijstra还用不习惯，位运算，链表都是新东西，需要再花点时间熟悉，有很多小技巧现在还没法自己想出来，比如链表加双指针，heap只扫描一遍就能维护好最优（有点像dp？）。
+
+到现在都还没在数算花很多时间，除了作业没做什么题，急急急。终于把高党结束了，希望能抽出一些时间花在数算上。
+
+
+
+
+
+
+# Assignment #5: 链表、栈、队列和归并排序
+
+Updated 1348 GMT+8 Mar 17, 2025
+
+2025 spring, Complied by <mark>陈宣之 生命科学学院</mark>
+
+
+
+> **说明：**
+>
+> 1. **解题与记录：**
+>
+>    对于每一个题目，请提供其解题思路（可选），并附上使用Python或C++编写的源代码（确保已在OpenJudge， Codeforces，LeetCode等平台上获得Accepted）。请将这些信息连同显示“Accepted”的截图一起填写到下方的作业模板中。（推荐使用Typora https://typoraio.cn 进行编辑，当然你也可以选择Word。）无论题目是否已通过，请标明每个题目大致花费的时间。
+>
+> 2. **提交安排：**提交时，请首先上传PDF格式的文件，并将.md或.doc格式的文件作为附件上传至右侧的“作业评论”区。确保你的Canvas账户有一个清晰可见的头像，提交的文件为PDF格式，并且“作业评论”区包含上传的.md或.doc附件。
+>
+> 3. **延迟提交：**如果你预计无法在截止日期前提交作业，请提前告知具体原因。这有助于我们了解情况并可能为你提供适当的延期或其他帮助。 
+>
+> 请按照上述指导认真准备和提交作业，以保证顺利完成课程要求。
+
+
+
+## 1. 题目
+
+### LC21.合并两个有序链表
+
+linked list, https://leetcode.cn/problems/merge-two-sorted-lists/
+
+思路：
+
+初始化头节点与运行节点，双指针list1和list2，若均非空，值小的连接在运行节点之后，指针进入下一位，若有一指针为空，运行节点连接非空指针节点，返回头节点以后部分
+
+代码：
+
+```python
+# Definition for singly-linked list.
+# class ListNode:
+#     def __init__(self, val=0, next=None):
+#         self.val = val
+#         self.next = next
+class Solution:
+    def mergeTwoLists(self, list1: Optional[ListNode], list2: Optional[ListNode]) -> Optional[ListNode]:
+        head=temp=ListNode(0)
+        while list1 and list2:
+            if list1.val<=list2.val:
+                temp.next=list1
+                list1=list1.next
+            else:
+                temp.next=list2
+                list2=list2.next
+            temp=temp.next
+        if list1:
+            temp.next=list1
+        else:
+            temp.next=list2
+        return head.next
+```
+
+
+
+代码运行截图 <mark>（至少包含有"Accepted"）</mark>
+
+![image-20250325093351852](C:\Users\20157\AppData\Roaming\Typora\typora-user-images\image-20250325093351852.png)
+
+
+
+### LC234.回文链表
+
+linked list, https://leetcode.cn/problems/palindrome-linked-list/
+
+<mark>请用快慢指针实现。</mark>
+
+（寒假写的）快慢指针找到中间节点，翻转中间节点以后的链表，比较前后链表，若相等则为回文
+
+代码：
+
+```python
+# Definition for singly-linked list.
+# class ListNode:
+#     def __init__(self, val=0, next=None):
+#         self.val = val
+#         self.next = next
+class Solution:
+    def isPalindrome(self, head: Optional[ListNode]) -> bool:
+        if not head or not head.next:
+            return True
+        else:
+            fast,slow=head,head
+            while fast and fast.next:
+                slow=slow.next
+                fast=fast.next.next
+            prev=None
+            while slow:
+                next_node=slow.next
+                slow.next=prev
+                prev=slow
+                slow=next_node
+            lft,rgt=head,prev
+            while rgt:
+                if lft.val!=rgt.val:
+                    return False
+                rgt=rgt.next
+                lft=lft.next
+            return True
+```
+
+
+
+代码运行截图 <mark>（至少包含有"Accepted"）</mark>
+
+![image-20250325094125255](C:\Users\20157\AppData\Roaming\Typora\typora-user-images\image-20250325094125255.png)
+
+
+
+### LC1472.设计浏览器历史记录
+
+doubly-lined list, https://leetcode.cn/problems/design-browser-history/
+
+<mark>请用双链表实现。</mark>
+
+
+
+代码：
+
+```python
+class ListNode:
+    def __init__(self,val=None,next=None,prev=None):
+        self.val=val
+        self.next=next
+        self.prev=prev
+
+class BrowserHistory:
+
+    def __init__(self, homepage: str):
+        self.cur=ListNode(homepage)
+        
+
+    def visit(self, url: str) -> None:
+        new=ListNode(url)
+        self.cur.next=new
+        new.prev=self.cur
+        self.cur=self.cur.next
+
+
+    def back(self, steps: int) -> str:
+        while steps>0 and self.cur.prev:
+            self.cur=self.cur.prev
+            steps-=1
+        return self.cur.val
+
+
+    def forward(self, steps: int) -> str:
+        while steps>0 and self.cur.next:
+            self.cur=self.cur.next
+            steps-=1
+        return self.cur.val
+
+
+
+# Your BrowserHistory object will be instantiated and called as such:
+# obj = BrowserHistory(homepage)
+# obj.visit(url)
+# param_2 = obj.back(steps)
+# param_3 = obj.forward(steps)
+```
+
+
+
+代码运行截图 <mark>（至少包含有"Accepted"）</mark>
+
+![image-20250325102113441](C:\Users\20157\AppData\Roaming\Typora\typora-user-images\image-20250325102113441.png)
+
+
+
+### 24591: 中序表达式转后序表达式
+
+stack, http://cs101.openjudge.cn/practice/24591/
+
+思路：
+
+stack存储运算符号与括号，扫描到数字即存入ans，扫描到运算符，将栈顶所有优先级更高的运算符弹出存入ans，再将该运算符压入栈，若扫描到右括号，弹出栈顶所有运算符存入ans直到左括号，最后将剩下的数字与运算符存入ans输出
+
+代码：
+
+```python
+symbols={"+":1,"-":1,"*":2,"/":2}
+n=int(input())
+for i in range(n):
+    equation=input()
+    stack=[]
+    ans=[]
+    num=""
+    for j in equation:
+        if j.isdigit() or j==".":
+            num+=j
+        else:
+            if num:
+                ans.append(num)
+                num=""
+            if j in symbols.keys():
+                while stack and stack[-1] in symbols.keys() and symbols[j]<=symbols[stack[-1]]:
+                    ans.append(stack.pop())
+                stack.append(j)
+            elif j=="(":
+                stack.append(j)
+            elif j==")":
+                while stack and stack[-1]!="(":
+                    ans.append(stack.pop())
+                stack.pop()
+    if num:
+        ans.append(num)
+    while stack:
+        ans.append(stack.pop())
+    print(" ".join(ans))
+```
+
+
+
+代码运行截图 <mark>（至少包含有"Accepted"）</mark>
+
+![image-20250325110051445](C:\Users\20157\AppData\Roaming\Typora\typora-user-images\image-20250325110051445.png)
+
+
+
+### 03253: 约瑟夫问题No.2
+
+queue, http://cs101.openjudge.cn/practice/03253/
+
+<mark>请用队列实现。</mark>
+
+
+
+代码：
+
+```python
+from collections import deque
+def josephus(n,p,m):
+    q=deque(range(n,0,-1))
+    q.rotate(p-1)
+    ans=[]
+    while q:
+        q.rotate(m-1)
+        ans.append(q.pop())
+    return ",".join(list(map(str,ans)))
+
+while True:
+    n,p,m=map(int,input().split())
+    if n==0 and p==0 and m==0:
+        break
+    print(josephus(n,p,m))
+```
+
+
+
+代码运行截图 <mark>（至少包含有"Accepted"）</mark>
+
+![image-20250325112028123](C:\Users\20157\AppData\Roaming\Typora\typora-user-images\image-20250325112028123.png)
+
+
+
+### 20018: 蚂蚁王国的越野跑
+
+merge sort, http://cs101.openjudge.cn/practice/20018/
+
+思路：
+
+经典Merge sort基础上ans计算后比前大的个数
+
+代码：
+
+```python
+n=int(input())
+ants=[]
+for _ in range(n):
+    ants.append(int(input()))
+ants.reverse()
+ans=0
+
+def merge_sort(arr):
+    global ans
+    if len(arr) <= 1:
+        return arr
+    mid = len(arr) // 2
+    left = arr[:mid]
+    right = arr[mid:]
+    left = merge_sort(left)
+    right = merge_sort(right)
+    return merge(left,right)
+
+def merge(left,right):
+    global ans
+    result=[]
+    i=j=0
+    while i<len(left) and j<len(right):
+        if left[i]<=right[j]:
+            result.append(left[i])
+            i+=1
+        else:
+            result.append(right[j])
+            j+=1
+            ans+=len(left)-i
+    result+=left[i:]
+    result+=right[j:]
+    return result
+
+
+merge_sort(ants)
+print(ans)
+```
+
+
+
+代码运行截图 <mark>（至少包含有"Accepted"）</mark>
+
+![image-20250325114123266](C:\Users\20157\AppData\Roaming\Typora\typora-user-images\image-20250325114123266.png)
+
+
+
+## 2. 学习总结和收获
+
+<mark>如果发现作业题目相对简单，有否寻找额外的练习题目，如“数算2025spring每日选做”、LeetCode、Codeforces、洛谷等网站上的题目。</mark>
+
+还是要多练习，通过写链表题现在已经大致熟悉了OOP写法。感觉stack还是难，后序计算还能写，中序转后序就混乱了。Merge sort在学计概的时候勉强弄懂，现在第二次学还是比较得心应手。这学期两门实验课，实验报告写得头大，每日选做进度非常缓慢。
+
+
+
+
+
+
+
+# Assignment #6: 回溯、树、双向链表和哈希表
+
+Updated 1526 GMT+8 Mar 22, 2025
+
+2025 spring, Complied by <mark>陈宣之 生命科学学院</mark>
+
+
+
+> **说明：**
+>
+> 1. **解题与记录：**
+>
+>    对于每一个题目，请提供其解题思路（可选），并附上使用Python或C++编写的源代码（确保已在OpenJudge， Codeforces，LeetCode等平台上获得Accepted）。请将这些信息连同显示“Accepted”的截图一起填写到下方的作业模板中。（推荐使用Typora https://typoraio.cn 进行编辑，当然你也可以选择Word。）无论题目是否已通过，请标明每个题目大致花费的时间。
+>
+> 2. **提交安排：**提交时，请首先上传PDF格式的文件，并将.md或.doc格式的文件作为附件上传至右侧的“作业评论”区。确保你的Canvas账户有一个清晰可见的头像，提交的文件为PDF格式，并且“作业评论”区包含上传的.md或.doc附件。
+>
+> 3. **延迟提交：**如果你预计无法在截止日期前提交作业，请提前告知具体原因。这有助于我们了解情况并可能为你提供适当的延期或其他帮助。 
+>
+> 请按照上述指导认真准备和提交作业，以保证顺利完成课程要求。
+
+
+
+## 1. 题目
+
+### LC46.全排列
+
+backtracking, https://leetcode.cn/problems/permutations/
+
+思路：
+
+dfs搜索，used存nums各位是否已在当前align，若为False则加入align，used设为True继续调用函数递推，然后回溯还原状态，当align长度为n时加入ans输出（注意深拷贝）
+
+代码：
+
+```python
+class Solution:
+    def permute(self, nums: List[int]) -> List[List[int]]:
+        n=len(nums)
+        ans=[]
+        used=[False]*n
+        def permutaion(align=[]):
+            if len(align)==n:
+                ans.append(align[:])
+                return
+            for i in range(n):
+                if used[i]==False:
+                    align.append(nums[i])
+                    used[i]=True
+                    permutaion(align)
+                    used[i]=False
+                    align.pop()
+            return ans
+        permutaion([])
+        return ans
+```
+
+
+
+代码运行截图 <mark>（至少包含有"Accepted"）</mark>
+
+![image-20250401094601511](C:\Users\20157\AppData\Roaming\Typora\typora-user-images\image-20250401094601511.png)
+
+
+
+### LC79: 单词搜索
+
+backtracking, https://leetcode.cn/problems/word-search/
+
+思路：
+
+dfs搜索，visited存储已经过的位置，四个方向遍历，只有当坐标合法，未经过，字母正确才返回True
+
+代码：
+
+```python
+class Solution:
+    def exist(self, board: List[List[str]], word: str) -> bool:
+        directions=[(1,0),(0,1),(-1,0),(0,-1)]
+        def dfs(i,j,cnt):
+            if board[i][j]!=word[cnt]:
+                return False
+            if cnt==len(word)-1:
+                return True
+            visited.add((i,j))
+            judge=False
+            for dx,dy in directions:
+                nx,ny=i+dx,j+dy
+                if 0<=nx<n and 0<=ny<m and (nx,ny) not in visited:
+                    if dfs(nx,ny,cnt+1):
+                        judge=True
+                        break
+            visited.remove((i,j))
+            return judge
+        
+        n=len(board)
+        m=len(board[0])
+        visited=set()
+        for i in range(n):
+            for j in range(m):
+                if dfs(i,j,0):
+                    return True
+        return False
+
+```
+
+
+
+代码运行截图 <mark>（至少包含有"Accepted"）</mark>
+
+![image-20250401105123758](C:\Users\20157\AppData\Roaming\Typora\typora-user-images\image-20250401105123758.png)
+
+
+
+### LC94.二叉树的中序遍历
+
+dfs, https://leetcode.cn/problems/binary-tree-inorder-traversal/
+
+思路：
+
+递归，dfs函数调用先后导致左子树优先加入，然后是根，最后是右子树，即中序遍历
+
+代码：
+
+```python
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+    def inorderTraversal(self, root: Optional[TreeNode]) -> List[int]:
+        ans=[]
+        def dfs(node):
+            if not node:
+                return
+            dfs(node.left)
+            ans.append(node.val)
+            dfs(node.right)
+        
+        dfs(root)
+        return ans
+```
+
+
+
+代码运行截图 <mark>（至少包含有"Accepted"）</mark>
+
+![image-20250401110611681](C:\Users\20157\AppData\Roaming\Typora\typora-user-images\image-20250401110611681.png)
+
+
+
+### LC102.二叉树的层序遍历
+
+bfs, https://leetcode.cn/problems/binary-tree-level-order-traversal/
+
+思路：
+
+用双端队列存储每一层的节点，知道上一层的节点数后可以popleft上一层节点，append下一层节点存入level，注意root也可能为None
+
+代码：
+
+```python
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+    from collections import deque
+    def levelOrder(self, root: Optional[TreeNode]) -> List[List[int]]:
+        if not root:
+            return []
+        ans=[]
+        q=deque()
+        q.append(root)
+        while q:
+            level=[]
+            for i in range(len(q)):
+                node=q.popleft()
+                level.append(node.val)
+                if node.left:
+                    q.append(node.left)
+                if node.right:
+                    q.append(node.right)
+            ans.append(level)
+        return ans
+```
+
+
+
+代码运行截图 <mark>（至少包含有"Accepted"）</mark>
+
+![image-20250401111829109](C:\Users\20157\AppData\Roaming\Typora\typora-user-images\image-20250401111829109.png)
+
+
+
+### LC131.分割回文串
+
+dp, backtracking, https://leetcode.cn/problems/palindrome-partitioning/
+
+思路：
+
+滚动数组背包问题预处理所有子序列回文情况，以左指针作为坐标dfs搜索右指针
+
+代码：
+
+```python
+class Solution:
+    def partition(self, s: str) -> List[List[str]]:
+        ans=[]
+        n=len(s)
+        dp=[[True]*n for i in range(n)]
+        for i in range(n-1,-1,-1):
+            for j in range(i+1,n):
+                dp[i][j]=(s[i]==s[j]) and dp[i+1][j-1]
+
+        temp=[]
+        def dfs(i):
+            if i==n:
+                ans.append(temp[:])
+                return
+            for j in range(i,n):
+                if dp[i][j]:
+                    temp.append(s[i:j+1])
+                    dfs(j+1)
+                    temp.pop()
+                    
+        dfs(0)
+        return ans
+```
+
+
+
+代码运行截图 <mark>（至少包含有"Accepted"）</mark>
+
+![image-20250401113736307](C:\Users\20157\AppData\Roaming\Typora\typora-user-images\image-20250401113736307.png)
+
+
+
+### LC146.LRU缓存
+
+hash table, doubly-linked list, https://leetcode.cn/problems/lru-cache/
+
+思路：
+
+建立双向链表，参数除了值还加上在哈希表中的键，LRUCache类中，以双向链表记录历史，初始化容量、哈希表、伪头节点和伪尾节点，定义renew函数将当前访问的已存在节点接在链表最后，get函数利用哈希表找到键对应的值，put函数覆盖已有键对应节点后renew或是初始化节点加在末尾并加入哈希表，若超过容量还需删去头节点。
+
+代码：
+
+```python
+class Node:
+    def __init__(self,key=0,value=0):
+        self.key=key
+        self.value=value
+        self.prev=None
+        self.next=None
+
+class LRUCache:
+
+    def __init__(self, capacity: int):
+        self.capacity=capacity
+        self.hashmap={}
+        self.head=Node()
+        self.tail=Node()
+        self.head.next=self.tail
+        self.tail.prev=self.head
+
+    def renew(self,key):
+        node=self.hashmap[key]
+        node.prev.next=node.next
+        node.next.prev=node.prev
+        node.prev=self.tail.prev
+        node.next=self.tail
+        self.tail.prev.next=node
+        self.tail.prev=node
+
+    def get(self, key: int) -> int:
+        if key in self.hashmap:
+            self.renew(key)
+            return self.hashmap.get(key).value
+        else:
+            return -1
+
+    def put(self, key: int, value: int) -> None:
+        if key in self.hashmap:
+            self.hashmap[key].value=value
+            self.renew(key)
+        else:
+            if len(self.hashmap)==self.capacity:
+                self.hashmap.pop(self.head.next.key)
+                self.head.next=self.head.next.next
+                self.head.next.prev=self.head
+            new=Node(key,value)
+            self.hashmap[key]=new
+            new.prev=self.tail.prev
+            new.next=self.tail
+            self.tail.prev.next=new
+            self.tail.prev=new
+
+# Your LRUCache object will be instantiated and called as such:
+# obj = LRUCache(capacity)
+# param_1 = obj.get(key)
+# obj.put(key,value)
+```
+
+
+
+代码运行截图 <mark>（至少包含有"Accepted"）</mark>
+
+![image-20250401120140046](C:\Users\20157\AppData\Roaming\Typora\typora-user-images\image-20250401120140046.png)
+
+
+
+## 2. 学习总结和收获
+
+<mark>如果发现作业题目相对简单，有否寻找额外的练习题目，如“数算2025spring每日选做”、LeetCode、Codeforces、洛谷等网站上的题目。</mark>
+
+基本掌握了链表的OOP写法，dfs递归已经不太熟练了，甚至stack的写法完全忘了（），通过作业题复习了一下dfs递归和背包dp。新学的树感觉大致跟线性结构形式没有很大区别，就是节点加指针，不过出现新的结构新的题目还是得再熟悉一下写法。两门实验课快结课了，下周开始应该能空出很多时间写题。这个月没怎么写作业题之外的练习，感觉月考有点悬。
+
+
+
+
+
+
+
+
+
+# Assignment #7: 20250402 Mock Exam
+
+Updated 1624 GMT+8 Apr 2, 2025
+
+2025 spring, Complied by <mark>陈宣之 生命科学学院</mark>
+
+
+
+> **说明：**
+>
+> 1. **⽉考**：AC<mark>3</mark> 。考试题⽬都在“题库（包括计概、数算题目）”⾥⾯，按照数字题号能找到，可以重新提交。作业中提交⾃⼰最满意版本的代码和截图。
+>
+> 2. **解题与记录：**
+>
+>    对于每一个题目，请提供其解题思路（可选），并附上使用Python或C++编写的源代码（确保已在OpenJudge， Codeforces，LeetCode等平台上获得Accepted）。请将这些信息连同显示“Accepted”的截图一起填写到下方的作业模板中。（推荐使用Typora https://typoraio.cn 进行编辑，当然你也可以选择Word。）无论题目是否已通过，请标明每个题目大致花费的时间。
+>
+> 3. **提交安排：**提交时，请首先上传PDF格式的文件，并将.md或.doc格式的文件作为附件上传至右侧的“作业评论”区。确保你的Canvas账户有一个清晰可见的头像，提交的文件为PDF格式，并且“作业评论”区包含上传的.md或.doc附件。
+>
+> 4. **延迟提交：**如果你预计无法在截止日期前提交作业，请提前告知具体原因。这有助于我们了解情况并可能为你提供适当的延期或其他帮助。 
+>
+> 请按照上述指导认真准备和提交作业，以保证顺利完成课程要求。
+
+
+
+## 1. 题目
+
+### E05344:最后的最后
+
+http://cs101.openjudge.cn/practice/05344/
+
+
+
+思路：
+
+建立双向循环链表（纯纯给自己找麻烦），kill（）实现节点删除，然后模拟
+
+代码：
+
+```python
+class Node:
+    def __init__(self, value=0):
+        self.prev = self
+        self.next = self
+        self.value = value
+
+    def kill(self):
+        if self.next == self:
+            return None
+        elif self.next.next == self:
+            self.next.prev,self.next.next = self.next,self.next
+            return self.next
+        else:
+            self.prev.next, self.next.prev = self.next, self.prev
+            return self.next
+
+
+class Solution:
+    def generate(self,n1):
+        the_node = Node(1)
+        for i in range(2, n1 + 1):
+            node1 = Node(i)
+            node1.prev,node1.next,the_node.next.prev,the_node.next = the_node, the_node.next, node1, node1
+            the_node = node1
+        return the_node.next
+
+    def josephus(self,node1,k1):
+        ans1 = []
+        while node1.next != node1:
+            for i in range(k1-1):
+                node1 = node1.next
+            ans1.append(node1.value)
+            node1 = node1.kill()
+        return ans1
+
+if __name__ == '__main__':
+    s = Solution()
+    n,k = map(int,input().split())
+    node = s.generate(n)
+    ans = s.josephus(node,k)
+    print(*ans)
+```
+
+
+
+代码运行截图 <mark>（至少包含有"Accepted"）</mark>
+
+![image-20250407161231091](C:\Users\20157\AppData\Roaming\Typora\typora-user-images\image-20250407161231091.png)
+
+
+
+### M02774: 木材加工
+
+binary search, http://cs101.openjudge.cn/practice/02774/
+
+
+
+思路：
+
+经典二分搜索
+
+代码：
+
+```python
+n,k=map(int,input().split())
+lengths=[]
+for i in range(n):
+    lengths.append(int(input()))
+lengths.sort()
+def judge(lg,k,lengths):
+    cnt=0
+    for i in lengths:
+        cnt+=i//lg
+    if cnt>=k:
+        return True
+    else:
+        return False
+
+lo,hi=1,lengths[-1]
+while lo<=hi:
+    mid=(lo+hi)//2
+    if judge(mid,k,lengths):
+        lo=mid+1
+    else:
+        hi=mid-1
+
+print(hi)
+```
+
+
+
+代码运行截图 <mark>（至少包含有"Accepted"）</mark>
+
+![image-20250407161032805](C:\Users\20157\AppData\Roaming\Typora\typora-user-images\image-20250407161032805.png)
+
+
+
+### M07161:森林的带度数层次序列存储
+
+tree, http://cs101.openjudge.cn/practice/07161/
+
+
+
+思路：
+
+初始化多叉树，将节点先存在nodes：List[TreeNode]，度存在degrees：Dict[TreeNode,int]。开始建树：scan扫描nodes，q=deque（）存已扫描过的，popleft出正在处理的节点current，从degrees中找到度，继续扫描该个数的节点加入children并存入q，建好后返回root。然后就是后序遍历递归输出。
+
+代码：
+
+```python
+from typing import List
+from collections import deque
+class TreeNode:
+    def __init__(self,val):
+        self.val = val
+        self.children = []
+
+class Solution:
+    def generate(self,saving:List[str]):
+        degrees=dict()
+        nodes=[]
+        for i in range(0,len(saving),2):
+            node=TreeNode(saving[i])
+            nodes.append(node)
+            degrees[node]=int(saving[i+1])
+        q=deque()
+        root=nodes[0]
+        q.append(root)
+        scan=1
+        while q:
+            current=q.popleft()
+            for i in range(degrees[current]):
+                current.children.append(nodes[scan+i])
+                q.append(current.children[-1])
+            scan+=degrees[current]
+        return root
+
+    def postorder(self,node:TreeNode,result:List[str])->List[str]:
+        for child in node.children:
+            self.postorder(child,result)
+        result.append(str(node.val))
+        return result
+
+if __name__ == '__main__':
+    n=int(input())
+    res=[]
+    for _ in range(n):
+        saving=input().split()
+        root=Solution().generate(saving)
+        res+=Solution().postorder(root,[])
+    print(*res)
+```
+
+
+
+代码运行截图 <mark>（至少包含有"Accepted"）</mark>
+
+![image-20250407222209758](C:\Users\20157\AppData\Roaming\Typora\typora-user-images\image-20250407222209758.png)
+
+
+
+### M18156:寻找离目标数最近的两数之和
+
+two pointers, http://cs101.openjudge.cn/practice/18156/
+
+
+
+思路：
+
+首尾双指针，大了右指针左移，小了左指针右移
+
+代码：
+
+```python
+target=int(input())
+arr=list(map(int,input().split()))
+arr.sort()
+lft,rgt=0,len(arr)-1
+ans=arr[lft]+arr[rgt]
+while lft<rgt-1:
+    if arr[lft]+arr[rgt]>target:
+        rgt-=1
+    elif arr[lft]+arr[rgt]<target:
+        lft+=1
+    else:
+        ans=arr[lft]+arr[rgt]
+        break
+    if abs(arr[lft]+arr[rgt]-target)<abs(ans-target) or \
+            abs(arr[lft]+arr[rgt]-target)==abs(ans-target) \
+            and arr[lft]+arr[rgt]<ans:
+        ans=arr[lft]+arr[rgt]
+print(ans)
+```
+
+
+
+代码运行截图 <mark>（至少包含有"Accepted"）</mark>
+
+![image-20250407224135834](C:\Users\20157\AppData\Roaming\Typora\typora-user-images\image-20250407224135834.png)
+
+
+
+### M18159:个位为 1 的质数个数
+
+sieve, http://cs101.openjudge.cn/practice/18159/
+
+
+
+思路：
+
+埃氏筛打表
+
+代码：
+
+```python
+judge=[1]*10001
+for i in range(2,10001):
+    for j in range(2*i,10001,i):
+        judge[j]=0
+for i in range(2,10001):
+    if str(i)[-1]!="1":
+        judge[i]=0
+
+
+n=int(input())
+for cnt in range(n):
+    a=int(input())
+    ans=[]
+    for i in range(2,a):
+        if judge[i]:
+            ans.append(i)
+    print("Case",cnt+1,":",sep="")
+    if ans:
+        print(*ans)
+    else:
+        print("NULL")
+```
+
+
+
+代码运行截图 <mark>（至少包含有"Accepted"）</mark>
+
+![image-20250407161159609](C:\Users\20157\AppData\Roaming\Typora\typora-user-images\image-20250407161159609.png)
+
+
+
+### M28127:北大夺冠
+
+hash table, http://cs101.openjudge.cn/practice/28127/
+
+
+
+思路：
+
+defaultdict加set计数，然后sort排序
+
+代码：
+
+```python
+from collections import defaultdict
+n=int(input())
+AC=defaultdict(set)
+update=defaultdict(int)
+for i in range(n):
+    team,question,result=input().split(",")
+    if result=="yes":
+        AC[team].add(question)
+    update[team]+=1
+
+AC_update=defaultdict(tuple)
+for team in update.keys():
+    AC_update[team]=(len(AC[team]),update[team])
+teams=sorted(AC_update.items(),key=lambda x:x[0])
+teams.sort(key=lambda x:(x[1][0],-x[1][1]),reverse=True)
+if len(teams)>12:
+    for i in range(12):
+        print(i+1,teams[i][0],teams[i][1][0],teams[i][1][1])
+else:
+    for i in range(len(teams)):
+        print(i+1,teams[i][0],teams[i][1][0],teams[i][1][1])
+```
+
+
+
+代码运行截图 ==（AC代码截图，至少包含有"Accepted"）==
+
+![image-20250407161006100](C:\Users\20157\AppData\Roaming\Typora\typora-user-images\image-20250407161006100.png)
+
+
+
+## 2. 学习总结和收获
+
+<mark>如果发现作业题目相对简单，有否寻找额外的练习题目，如“数算2025spring每日选做”、LeetCode、Codeforces、洛谷等网站上的题目。</mark>
+
+月考有点过于放松了，当练习写了属于是（）。
+
+约瑟夫问题用链表死磕，而且自找麻烦写的双向循环链表，考场上有些小bug没debug出来。
+
+加上对我来说有些超纲的多叉树，这两题可以算是我第一次独立写OOP，好消息是可以写得自认为比较规范了，坏消息是都没有AC（难蚌），花了很多时间然后先放着了。
+
+剩下一个小时左右，木材加工是经典二分查找，数质数是埃氏筛打表，都很快就解决了。北大夺冠用的defaultdict存，set计数，因为sort的lambda写法不太能同时排序两个字典，卡了一会儿，于是先合并把数据塞到一起。两数之和后来发现其实很简单，但一看到这种只给一个数列的，看起来像是greedy的题就发怵，写了首位两个指针后迟迟不敢往下写，属于是结束后自己研究半天都不觉得是简单题（害怕）
+
+总而言之，前半学期练习的少，只有理论没有实践，只AC3是可预见的。期中过后大概就有比较充裕的时间追每日一练了。
+
+看群里截图，怎么感觉数算大佬比计概还多（
+
+
+
+
+
+
+
+# Assignment #8: 树为主
+
+Updated 1704 GMT+8 Apr 8, 2025
+
+2025 spring, Complied by <mark>陈宣之 生命科学学院</mark>
+
+
+
+> **说明：**
+>
+> 1. **解题与记录：**
+>
+>    对于每一个题目，请提供其解题思路（可选），并附上使用Python或C++编写的源代码（确保已在OpenJudge， Codeforces，LeetCode等平台上获得Accepted）。请将这些信息连同显示“Accepted”的截图一起填写到下方的作业模板中。（推荐使用Typora https://typoraio.cn 进行编辑，当然你也可以选择Word。）无论题目是否已通过，请标明每个题目大致花费的时间。
+>
+> 2. **提交安排：**提交时，请首先上传PDF格式的文件，并将.md或.doc格式的文件作为附件上传至右侧的“作业评论”区。确保你的Canvas账户有一个清晰可见的头像，提交的文件为PDF格式，并且“作业评论”区包含上传的.md或.doc附件。
+>
+> 3. **延迟提交：**如果你预计无法在截止日期前提交作业，请提前告知具体原因。这有助于我们了解情况并可能为你提供适当的延期或其他帮助。 
+>
+> 请按照上述指导认真准备和提交作业，以保证顺利完成课程要求。
+
+
+
+## 1. 题目
+
+### LC108.将有序数组转换为二叉树
+
+dfs, https://leetcode.cn/problems/convert-sorted-array-to-binary-search-tree/
+
+思路：
+
+已有中序输出，建平衡二叉树，dfs每一步取中间（(lft+rgt+1)//2是左子树可能更长的情况）作为根节点，小的作为左子树，大的作为右子树以满足中序升序。
+
+代码：
+
+```python
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+    def sortedArrayToBST(self, nums: List[int]) -> Optional[TreeNode]:
+        def parse(lft,rgt):
+            if lft>rgt:
+                return None
+            mid=(lft+rgt+1)//2
+            root=TreeNode(nums[mid])
+            root.left=parse(lft,mid-1)
+            root.right=parse(mid+1,rgt)
+            return root
+        return parse(0,len(nums)-1)
+```
+
+
+
+代码运行截图 <mark>（至少包含有"Accepted"）</mark>
+
+![image-20250414234756424](C:\Users\20157\AppData\Roaming\Typora\typora-user-images\image-20250414234756424.png)
+
+
+
+### M27928:遍历树
+
+ adjacency list, dfs, http://cs101.openjudge.cn/practice/27928/
+
+思路：
+
+建多叉树，设parent以便找到根节点，每遍历到一个节点，将子节点排序，先递归处理值小的子节点，输出现节点，再递归值大的子节点
+
+代码：
+
+```python
+class TreeNode:
+    def __init__(self,val=None):
+        self.val = val
+        self.children=[]
+        self.parent=None
+
+
+def traverse(node):
+    sorted_children=sorted(node.children,key=lambda x:x.val)
+    for child in sorted_children:
+        if child.val<node.val:
+            traverse(child)
+    print(node.val)
+    for child in sorted_children:
+        if child.val>node.val:
+            traverse(child)
+
+
+def main():
+    n=int(input())
+    Nodes={}
+    for i in range(n):
+        a=list(map(int,input().split()))
+        if a[0] not in Nodes.keys():
+            Nodes[a[0]]=TreeNode(a[0])
+        current=Nodes[a[0]]
+        for j in range(1,len(a)):
+            if a[j] not in Nodes.keys():
+                Nodes[a[j]]=TreeNode(a[j])
+            current.children.append(Nodes[a[j]])
+            Nodes[a[j]].parent=current
+
+    while current.parent:
+        current=current.parent
+    traverse(current)
+
+if __name__ == '__main__':
+    main()
+```
+
+
+
+代码运行截图 <mark>（至少包含有"Accepted"）</mark>
+
+![image-20250415101447405](C:\Users\20157\AppData\Roaming\Typora\typora-user-images\image-20250415101447405.png)
+
+
+
+### LC129.求根节点到叶节点数字之和
+
+dfs, https://leetcode.cn/problems/sum-root-to-leaf-numbers/
+
+思路：
+
+dfs
+
+代码：
+
+```python
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+    def sumNumbers(self, root: Optional[TreeNode]) -> int:
+        res=0
+        def dfs(node,route):
+            nonlocal res
+            if not node.left and not node.right:
+                res+=int(route)
+            if node.left:
+                dfs(node.left,route+str(node.left.val))
+            if node.right:
+                dfs(node.right,route+str(node.right.val))
+        dfs(root,str(root.val))
+        return res
+```
+
+
+
+代码运行截图 <mark>（至少包含有"Accepted"）</mark>
+
+![image-20250415105155514](C:\Users\20157\AppData\Roaming\Typora\typora-user-images\image-20250415105155514.png)
+
+
+
+### M22158:根据二叉树前中序序列建树
+
+tree, http://cs101.openjudge.cn/practice/22158/
+
+思路：
+
+有前序preorder（根，左子树，右子树）和中序inorder（左子树，根，右子树），返回根preorder[0]，在inorder中找到该值位置root_index，左边为左子树，右边为右子树，知道子树大小，在前序中也可拆分出左右子树，分别递归，左右子树返回的根作为self和right。建好树后后序遍历。
+
+代码：
+
+```python
+import sys
+class TreeNode:
+    def __init__(self,val=None):
+        self.val=val
+        self.left=None
+        self.right=None
+
+def parse(preorder,inorder):
+    if not preorder or not inorder:
+        return None
+    root=TreeNode(preorder[0])
+    root.index=inorder.index(preorder[0])
+    root.left=parse(preorder[1:root.index+1],inorder[:root.index])
+    root.right=parse(preorder[root.index+1:],inorder[root.index+1:])
+    return root
+
+def postorder_traversal(node):
+    if not node:
+        return
+    postorder_traversal(node.left)
+    postorder_traversal(node.right)
+    print(node.val,end='')
+
+def main():
+    lines=sys.stdin.readlines()
+    for i in range(0,len(lines),2):
+        preorder=lines[i].strip()
+        inorder=lines[i+1].strip()
+        root=parse(preorder,inorder)
+        postorder_traversal(root)
+        print()
+
+if __name__=='__main__':
+    main()
+```
+
+
+
+代码运行截图 <mark>（至少包含有"Accepted"）</mark>
+
+![image-20250415112721448](C:\Users\20157\AppData\Roaming\Typora\typora-user-images\image-20250415112721448.png)
+
+
+
+### M24729:括号嵌套树
+
+dfs, stack, http://cs101.openjudge.cn/practice/24729/
+
+思路：
+
+用stack建树，先把字母全初始化为节点，用字典存储。把输入压入栈直到右括号，pop当前括号内元素存在children，去掉','即为子节点键，pop掉左括号，栈顶为父节点键。stack[0]为root键。然后正序和反序遍历。
+
+代码：
+
+```python
+class TreeNode:
+    def __init__(self,val=None):
+        self.val=val
+        self.children=[]
+
+def parse(bracket):
+    stack=[]
+    nodes={}
+    for i in bracket:
+        if i.isalpha():
+            nodes[i]=TreeNode(i)
+        if i!=')':
+            stack.append(i)
+        else:
+            children=''
+            while stack[-1]!='(':
+                children+=stack.pop()
+            stack.pop()
+            children=list(reversed(children.split(',')))
+            parent=nodes[stack[-1]]
+            for child in children:
+                parent.children.append(nodes[child])
+    return nodes[stack[0]]
+
+def preorder_traversal(node):
+    if not node:
+        return
+    print(node.val,end='')
+    for child in node.children:
+        preorder_traversal(child)
+
+def postorder_traversal(node):
+    if not node:
+        return
+    for child in node.children:
+        postorder_traversal(child)
+    print(node.val,end='')
+
+def main():
+    bracket=input()
+    root=parse(bracket)
+    preorder_traversal(root)
+    print()
+    postorder_traversal(root)
+
+if __name__=='__main__':
+    main()
+```
+
+
+
+代码运行截图 <mark>（至少包含有"Accepted"）</mark>
+
+![image-20250415130645346](C:\Users\20157\AppData\Roaming\Typora\typora-user-images\image-20250415130645346.png)
+
+
+
+### LC3510.移除最小数对使数组有序II
+
+doubly-linked list + heap, https://leetcode.cn/problems/minimum-pair-removal-to-sort-array-ii/
+
+思路：
+
+放弃了，写了四五个小时，发现只能满足全正数数组
+
+代码：
+
+```python
+WA：
+class Node:
+    def __init__(self,val=None):
+        self.val=val
+        self.prev=None
+        self.next=None
+
+class Solution:
+    def minimumPairRemoval(self, nums: List[int]) -> int:
+        n=len(nums)
+        dec=0  #降序数
+        current=Node(nums[0])
+        q=[]
+        lazy={0:1}
+        for i in range(1,n):
+            new=Node(nums[i])
+            lazy[i]=1
+            if nums[i]<nums[i-1]:
+                dec+=1  #记录降序数
+            current.next,new.prev=new,current  #建双向链表
+            heapq.heappush(q,(current.val+new.val,i,current))  #最小堆找和最小且最左端的数对
+            current=new
+
+        ans=0
+        while dec:
+            if not q:
+                return ans
+            sumval,index,current=heapq.heappop(q)  #当前和最小的数对
+            if not lazy[index]:
+                continue  #排除已被合并的
+            if lazy[index]>1:
+                lazy[index]-=1
+                continue  #排除和已更新的（一定往大了更新）
+            ans+=1  #进行合并
+            for rgt in range(index+1,n):
+                if lazy[rgt]>0:  #找到下一位
+                    lazy[rgt]=0
+                    break
+            if current.val>current.next.val:  #合并前为降序
+                dec-=1
+            if current.prev:
+                if current.val<current.prev.val and sumval>=current.prev.val:  #合并前左为降序，合并后为升序
+                    dec-=1
+            if current.next.next:
+                if current.next.next.val>=current.next.val and current.next.next.val<sumval:  #合并前右为升序，合并后为降序
+                    dec+=1
+
+            current.val=sumval  #合并
+            if current.next.next:  #更新双向链表，删除右节点
+                current.next.next.prev,current.next=current,current.next.next
+            else:
+                current.next=None  #右侧节点在末尾
+
+            if current.prev:
+                i=1
+                while not lazy[index-i]:
+                    i+=1  #找到左侧节点
+                heapq.heappush(q,(current.prev.val+sumval,index-i,current.prev))  #更新左侧优先队列
+                lazy[index-i]+=1  #懒删除原队列元素
+            if current.next:
+                heapq.heappush(q,(current.next.val+sumval,index,current))  #更新右侧优先队列
+                lazy[rgt]+=1  #懒删除原队列元素
+        return ans
+```
+
+
+
+代码运行截图 <mark>（至少包含有"Accepted"）</mark>
+
+
+
+
+
+## 2. 学习总结和收获
+
+<mark>如果发现作业题目相对简单，有否寻找额外的练习题目，如“数算2025spring每日选做”、LeetCode、Codeforces、洛谷等网站上的题目。</mark>
+
+这次作业真的好难qwq，不过基本理解树的结构后建树越来越熟练了，三种遍历dfs也基本没问题，OOP写规范还是很赏心悦目的。
+
+最后一题真写不出来了，之后好好研究一下题解吧。
+
+这周期中结束，希望把每日一练尽量做做。太多数据结构有点接受不过来了（emmmm谁说数算简单的），多做练习巩固巩固。
+
+
+
+
+
+
+
+
+
+# Assignment #9: Huffman, BST & Heap
+
+Updated 1834 GMT+8 Apr 15, 2025
+
+2025 spring, Complied by <mark>陈宣之 生命科学学院</mark>
+
+
+
+> **说明：**
+>
+> 1. **解题与记录：**
+>
+>    对于每一个题目，请提供其解题思路（可选），并附上使用Python或C++编写的源代码（确保已在OpenJudge， Codeforces，LeetCode等平台上获得Accepted）。请将这些信息连同显示“Accepted”的截图一起填写到下方的作业模板中。（推荐使用Typora https://typoraio.cn 进行编辑，当然你也可以选择Word。）无论题目是否已通过，请标明每个题目大致花费的时间。
+>
+> 2. **提交安排：**提交时，请首先上传PDF格式的文件，并将.md或.doc格式的文件作为附件上传至右侧的“作业评论”区。确保你的Canvas账户有一个清晰可见的头像，提交的文件为PDF格式，并且“作业评论”区包含上传的.md或.doc附件。
+>
+> 3. **延迟提交：**如果你预计无法在截止日期前提交作业，请提前告知具体原因。这有助于我们了解情况并可能为你提供适当的延期或其他帮助。 
+>
+> 请按照上述指导认真准备和提交作业，以保证顺利完成课程要求。
+
+
+
+## 1. 题目
+
+### LC222.完全二叉树的节点个数
+
+dfs, https://leetcode.cn/problems/count-complete-tree-nodes/
+
+思路：
+
+dfs遍历
+
+代码：
+
+```python
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+    def countNodes(self, root: Optional[TreeNode]) -> int:
+        def dfs(node):
+            if not node:
+                return 0
+            lft,rgt=0,0
+            if node.left:
+                lft=dfs(node.left)
+            if node.right:
+                rgt=dfs(node.right)
+            return lft+rgt+1
+        return dfs(root)
+```
+
+
+
+代码运行截图 <mark>（至少包含有"Accepted"）</mark>
+
+![image-20250421184024442](C:\Users\20157\AppData\Roaming\Typora\typora-user-images\image-20250421184024442.png)
+
+
+
+### LC103.二叉树的锯齿形层序遍历
+
+bfs, https://leetcode.cn/problems/binary-tree-zigzag-level-order-traversal/
+
+思路：
+
+bfs遍历，每层存入defaultdict
+
+代码：
+
+```python
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+    from collections import deque,defaultdict
+    def zigzagLevelOrder(self, root: Optional[TreeNode]) -> List[List[int]]:
+        q=deque()
+        q.append((0,root))
+        d=defaultdict(list)
+        if not root:
+            return []
+        while q:
+            layer,node=q.popleft()
+            d[layer].append(node.val)
+            if node.left:
+                q.append((layer+1,node.left))
+            if node.right:
+                q.append((layer+1,node.right))
+        
+        ans=[]
+        layer=0
+        while d[layer]:
+            if layer%2==0:
+                ans.append(d[layer])
+            else:
+                ans.append(d[layer][::-1])
+            layer+=1
+        return ans
+```
+
+
+
+代码运行截图 <mark>（至少包含有"Accepted"）</mark>
+
+![image-20250421190753134](C:\Users\20157\AppData\Roaming\Typora\typora-user-images\image-20250421190753134.png)
+
+
+
+### M04080:Huffman编码树
+
+greedy, http://cs101.openjudge.cn/practice/04080/
+
+思路：
+
+heapq找到最小的两个数合并
+
+代码：
+
+```python
+import heapq
+def huffman(arr):
+    ans=0
+    heapq.heapify(arr)
+    while len(arr)>1:
+        a,b=heapq.heappop(arr),heapq.heappop(arr)
+        ans+=a+b
+        heapq.heappush(arr,a+b)
+    return ans
+
+if __name__=='__main__':
+    n=int(input())
+    arr=list(map(int,input().split()))
+    print(huffman(arr))
+```
+
+
+
+代码运行截图 <mark>（至少包含有"Accepted"）</mark>
+
+![image-20250422094252378](C:\Users\20157\AppData\Roaming\Typora\typora-user-images\image-20250422094252378.png)
+
+
+
+### M05455: 二叉搜索树的层次遍历
+
+http://cs101.openjudge.cn/practice/05455/
+
+思路：
+
+
+
+代码：
+
+```python
+from collections import deque
+class TreeNode:
+    def __init__(self, val=0, left=None, right=None):
+        self.val = val
+        self.left = left
+        self.right = right
+
+def bst_build(root,val):
+    if not root:
+        return TreeNode(val)
+    if val < root.val:
+        root.left = bst_build(root.left,val)
+    else:
+        root.right = bst_build(root.right,val)
+    return root
+
+def level_order_traversal(root):
+    if not root:
+        return []
+    queue=deque()
+    queue.append(root)
+    res=[]
+    while queue:
+        node=queue.popleft()
+        res.append(node.val)
+        if node.left:
+            queue.append(node.left)
+        if node.right:
+            queue.append(node.right)
+    return res
+
+def main():
+    arr=list(map(int,input().split()))
+    processed=set()
+    root=None
+    for i in arr:
+        if i in processed:
+            continue
+        processed.add(i)
+        root=bst_build(root,i)
+    print(*level_order_traversal(root))
+
+if __name__ == '__main__':
+    main()
+```
+
+
+
+代码运行截图 <mark>（至少包含有"Accepted"）</mark>
+
+![image-20250422101038331](C:\Users\20157\AppData\Roaming\Typora\typora-user-images\image-20250422101038331.png)
+
+
+
+### M04078: 实现堆结构
+
+手搓实现，http://cs101.openjudge.cn/practice/04078/
+
+类似的题目是 晴问9.7: 向下调整构建大顶堆，https://sunnywhy.com/sfbj/9/7
+
+思路：
+
+
+
+代码：
+
+```python
+class BinaryHeap:
+    def __init__(self):
+        self._heap=[]
+
+    def _percolate_up(self, i):
+        while (i-1)//2>=0:
+            parent_i=(i-1)//2
+            if self._heap[i]<self._heap[parent_i]:
+                self._heap[i],self._heap[parent_i]=\
+                    self._heap[parent_i],self._heap[i]
+            i=parent_i
+
+    def _get_min_child(self, i):
+        if 2*i+2>len(self._heap)-1:
+            return 2*i+1
+        if self._heap[2*i+1]<self._heap[2*i+2]:
+            return 2*i+1
+        return 2*i+2
+
+    def _percolate_down(self, i):
+        while 2*i+1<len(self._heap):
+            child=self._get_min_child(i)
+            if self._heap[i]>self._heap[child]:
+                self._heap[i],self._heap[child]=\
+                    self._heap[child],self._heap[i]
+            else:
+                break
+            i=child
+
+    def insert(self, val):
+        self._heap.append(val)
+        self._percolate_up(len(self._heap)-1)
+
+    def delete_min(self):
+        self._heap[0], self._heap[-1]=self._heap[-1], self._heap[0]
+        res=self._heap.pop()
+        self._percolate_down(0)
+        return res
+
+def main():
+    n=int(input())
+    q=BinaryHeap()
+    for i in range(n):
+        operation=input().split()
+        if operation[0]=="1":
+            q.insert(int(operation[1]))
+        elif operation[0]=="2":
+            print(q.delete_min())
+
+if __name__=="__main__":
+    main()
+```
+
+
+
+代码运行截图 <mark>（至少包含有"Accepted"）</mark>
+
+![image-20250422140531492](C:\Users\20157\AppData\Roaming\Typora\typora-user-images\image-20250422140531492.png)
+
+
+
+### T22161: 哈夫曼编码树
+
+greedy, http://cs101.openjudge.cn/practice/22161/
+
+思路：
+
+
+
+代码：
+
+```python
+import heapq
+import sys
+
+class TreeNode:
+    def __init__(self,weight,char=None):
+        self.weight=weight
+        self.char=char
+        self.left=None
+        self.right=None
+
+    def __lt__(self, other):
+        if self.weight==other.weight:
+            return self.char<other.char
+        return self.weight<other.weight
+
+def build_tree(char_freq):
+    heap=[]
+    for char,freq in char_freq.items():
+        heapq.heappush(heap,TreeNode(freq,char))
+    while len(heap)>1:
+        left=heapq.heappop(heap)
+        right=heapq.heappop(heap)
+        merged=TreeNode(left.weight+right.weight,min(left.char,right.char))
+        merged.left=left
+        merged.right=right
+        heapq.heappush(heap,merged)
+    return heap[0]
+
+def encode(root):
+    codes={}
+    def traverse(node,code):
+        if node.left is None and node.right is None:
+            codes[node.char]=code
+        else:
+            traverse(node.left,code+"0")
+            traverse(node.right,code+"1")
+    traverse(root,'')
+    return codes
+
+def decode(codes,string):
+    encoded=''
+    for char in string:
+        encoded+=codes[char]
+    return encoded
+
+def huffman_encoding(root,string):
+    decoded=''
+    node=root
+    for bit in string:
+        if bit=='0':
+            node=node.left
+        else:
+            node=node.right
+
+        if node.left is None and node.right is None:
+            decoded+=node.char
+            node=root
+    return decoded
+
+def main():
+    commands=sys.stdin.readlines()
+    n=int(commands[0].strip())
+    char_freq={}
+    for i in range(1,n+1):
+        char,freq=commands[i].strip().split()
+        char_freq[char]=int(freq)
+
+    root=build_tree(char_freq)
+    codes=encode(root)
+
+    for string in commands[n+1:]:
+        string=string.strip()
+        if string[0] in ('0','1'):
+            print(huffman_encoding(root,string))
+        else:
+            print(decode(codes,string))
+
+if __name__=='__main__':
+    main()
+```
+
+
+
+代码运行截图 <mark>（至少包含有"Accepted"）</mark>
+
+![image-20250422143631258](C:\Users\20157\AppData\Roaming\Typora\typora-user-images\image-20250422143631258.png)
+
+
+
+## 2. 学习总结和收获
+
+<mark>如果发现作业题目相对简单，有否寻找额外的练习题目，如“数算2025spring每日选做”、LeetCode、Codeforces、洛谷等网站上的题目。</mark>
+
+BST感觉还好，huffman树和手搓heap还是太复杂了，代码长的吓人，具体原理能理解，真要自己写还是比较困难，照着课件写了几遍，依旧没有自信能顺利写出来。
+
+
+
+
+
+
+
+
+
+# Assignment #A: Graph starts
+
+Updated 1830 GMT+8 Apr 22, 2025
+
+2025 spring, Complied by <mark>同学的姓名、院系</mark>
+
+
+
+> **说明：**
+>
+> 1. **解题与记录：**
+>
+>    对于每一个题目，请提供其解题思路（可选），并附上使用Python或C++编写的源代码（确保已在OpenJudge， Codeforces，LeetCode等平台上获得Accepted）。请将这些信息连同显示“Accepted”的截图一起填写到下方的作业模板中。（推荐使用Typora https://typoraio.cn 进行编辑，当然你也可以选择Word。）无论题目是否已通过，请标明每个题目大致花费的时间。
+>
+> 2. **提交安排：**提交时，请首先上传PDF格式的文件，并将.md或.doc格式的文件作为附件上传至右侧的“作业评论”区。确保你的Canvas账户有一个清晰可见的头像，提交的文件为PDF格式，并且“作业评论”区包含上传的.md或.doc附件。
+>
+> 3. **延迟提交：**如果你预计无法在截止日期前提交作业，请提前告知具体原因。这有助于我们了解情况并可能为你提供适当的延期或其他帮助。 
+>
+> 请按照上述指导认真准备和提交作业，以保证顺利完成课程要求。
+
+
+
+## 1. 题目
+
+### M19943:图的拉普拉斯矩阵
+
+OOP, implementation, http://cs101.openjudge.cn/practice/19943/
+
+要求创建Graph, Vertex两个类，建图实现。
+
+思路：
+
+
+
+代码：
+
+矩阵
+
+```
+class Graph:
+    def __init__(self,vertices,edges):
+        self.vertices=vertices
+        self.edges=edges
+        self.adj_matrix=self.create_adj_matrix()
+        self.degree_matrix=self.create_degree_matrix()
+
+    def create_degree_matrix(self):
+        degree_matrix=[[0]*self.vertices for _ in range(self.vertices)]
+        for i,j in self.edges:
+            degree_matrix[i][i]+=1
+            degree_matrix[j][j]+=1
+        return degree_matrix
+
+    def create_adj_matrix(self):
+        adj_matrix=[[0]*self.vertices for _ in range(self.vertices)]
+        for i,j in self.edges:
+            adj_matrix[i][j]=1
+            adj_matrix[j][i]=1
+        return adj_matrix
+
+def main():
+    n,m=map(int,input().split())
+    edges=[]
+    for i in range(m):
+        a,b=map(int,input().split())
+        edges.append((a,b))
+    g=Graph(n,edges)
+    laplace_matrix=[[0]*n for _ in range(n)]
+    for i in range(n):
+        for j in range(n):
+            laplace_matrix[i][j]=g.degree_matrix[i][j]-g.adj_matrix[i][j]
+    for i in range(n):
+        print(*laplace_matrix[i])
+
+if __name__=="__main__":
+    main()
+```
+
+图类
+
+```python
+class Vertex:
+    def __init__(self,key):
+        self.key=key
+        self.neighbors={}
+
+    def get_neighbor(self,other):
+        return self.neighbors.get(other,None)
+
+    def set_neighbors(self,other,weight=0):
+        self.neighbors[other]=weight
+
+    def __str__(self):
+        return (str(self.key)
+                +'connected to:'
+                +str([x.key for x in self.neighbors]))
+
+    def get_neighbors(self):
+        return self.neighbors.keys()
+
+    def get_key(self):
+        return self.key
+
+class Graph:
+    def __init__(self):
+        self.vertices={}
+
+    def set_vertex(self,key):
+        self.vertices[key]=Vertex(key)
+
+    def get_vertex(self,key):
+        return self.vertices.get(key,None)
+
+    def __contains__(self,key):
+        return key in self.vertices
+
+    def add_edge(self,from_vertex,to_vertex,weight=0):
+        if from_vertex not in self.vertices:
+            self.set_vertex(from_vertex)
+        if to_vertex not in self.vertices:
+            self.set_vertex(to_vertex)
+        self.vertices[from_vertex].set_neighbors(self.vertices[to_vertex],weight)
+
+    def get_vertices(self):
+        return self.vertices.keys()
+
+    def __iter__(self):
+        return iter(self.vertices.values())
+
+def main(n,edges):
+    graph=Graph()
+    for i in range(n):
+        graph.set_vertex(i)
+
+    for edge in edges:
+        a,b=edge
+        graph.add_edge(a,b)
+        graph.add_edge(b,a)
+
+    laplacian=[]
+    for vertex in graph:
+        row=[0]*n
+        row[vertex.get_key()]=len(vertex.get_neighbors())
+        for neighbor in vertex.get_neighbors():
+            row[neighbor.get_key()]=-1
+        laplacian.append(row)
+
+    return laplacian
+
+
+if __name__=="__main__":
+    n,m=map(int,input().split())
+    edges=[]
+    for i in range(m):
+        a,b=map(int,input().split())
+        edges.append((a,b))
+
+    laplacian=main(n,edges)
+    for row in laplacian:
+        print(*row)
+```
+
+
+
+代码运行截图 <mark>（至少包含有"Accepted"）</mark>
+
+![image-20250429115243094](C:\Users\20157\AppData\Roaming\Typora\typora-user-images\image-20250429115243094.png)
+
+![image-20250429115124923](C:\Users\20157\AppData\Roaming\Typora\typora-user-images\image-20250429115124923.png)
+
+
+
+### LC78.子集
+
+backtracking, https://leetcode.cn/problems/subsets/
+
+思路：
+
+dfs
+
+代码：
+
+```python
+class Solution:
+    def subsets(self, nums: List[int]) -> List[List[int]]:
+        ans=[]
+        def dfs(prefix=[],index=0):
+            if index==len(nums):
+                ans.append(prefix)
+                return
+            dfs(prefix,index+1)
+            dfs(prefix+[nums[index]],index+1)
+        dfs()
+        return ans
+```
+
+
+
+代码运行截图 <mark>（至少包含有"Accepted"）</mark>
+
+![image-20250429115341950](C:\Users\20157\AppData\Roaming\Typora\typora-user-images\image-20250429115341950.png)
+
+
+
+### LC17.电话号码的字母组合
+
+hash table, backtracking, https://leetcode.cn/problems/letter-combinations-of-a-phone-number/
+
+思路：
+
+dfs
+
+代码：
+
+```python
+class Solution:
+    def letterCombinations(self, digits: str) -> List[str]:
+        hashtable={'2':'abc','3':'def','4':'ghi','5':'jkl','6':'mno',\
+                                        '7':'pqrs','8':'tuv','9':'wxyz'}
+        ans=[]
+        length=len(digits)
+        if length==0:
+            return ans
+        def dfs(step=0,temp=''):
+            nonlocal ans,digits
+            if step>=length:
+                ans.append(temp)
+                return
+            num=digits[step]
+            for dig in hashtable[num]:
+                dfs(step+1,temp+dig)
+            temp=temp[:-1]
+            step-=1
+        dfs()
+        return ans
+```
+
+
+
+代码运行截图 <mark>（至少包含有"Accepted"）</mark>
+
+![image-20250429131905968](C:\Users\20157\AppData\Roaming\Typora\typora-user-images\image-20250429131905968.png)
+
+
+
+### M04089:电话号码
+
+trie, http://cs101.openjudge.cn/practice/04089/
+
+思路：
+
+自己还是写不出来，先抄。
+
+代码：
+
+```python
+import sys
+class TrieNode:
+    def __init__(self):
+        self.children={}
+        self.is_end_of_number=False
+
+class Trie:
+    def __init__(self):
+        self.root=TrieNode()
+
+    def insert(self,num):
+        node=self.root
+        for digit in num:
+            if digit not in node.children:
+                node.children[digit]=TrieNode()
+            node=node.children[digit]
+            if node.is_end_of_number:
+                return False
+        node.is_end_of_number=True
+        return len(node.children)==0
+
+    def is_prefix(self,numbers):
+        numbers.sort()
+        for num in numbers:
+            if not self.insert(num):
+                return False
+        return True
+
+def main():
+    input=sys.stdin.read()
+    data=input.splitlines()
+
+    t=int(data[0])
+    index=1
+    res=[]
+
+    for i in range(t):
+        n=int(data[index])
+        index+=1
+        numbers=data[index:index+n]
+        index+=n
+        trie=Trie()
+        if trie.is_prefix(numbers):
+            res.append("YES")
+        else:
+            res.append("NO")
+
+    for r in res:
+        print(r)
+
+if __name__=="__main__":
+    main()
+
+```
+
+
+
+代码运行截图 <mark>（至少包含有"Accepted"）</mark>
+
+![image-20250429184231305](C:\Users\20157\AppData\Roaming\Typora\typora-user-images\image-20250429184231305.png)
+
+
+
+### T28046:词梯
+
+bfs, http://cs101.openjudge.cn/practice/28046/
+
+思路：
+
+本来用Vertax和Gragh类写，太长了写的脑壳儿昏，遂直接用邻接表。
+
+邻接表建好图后，bfs遍历，predecessor记录路径输出。
+
+代码：
+
+```python
+from collections import deque, defaultdict
+import sys
+
+n = int(sys.stdin.readline())
+words = [sys.stdin.readline().strip() for _ in range(n)]
+start, end = sys.stdin.readline().strip().split()
+
+word_set = set(words)
+if start not in word_set or end not in word_set:
+    print("NO")
+    sys.exit()
+
+# 构建邻接表
+adj = defaultdict(list)
+for word in words:
+    neighbors = set()
+    for i in range(4):
+        current_char = word[i]
+        if current_char.isupper():
+            letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+        else:
+            letters = 'abcdefghijklmnopqrstuvwxyz'
+        for c in letters:
+            if c == current_char:
+                continue
+            new_word = word[:i] + c + word[i+1:]
+            if new_word in word_set:
+                neighbors.add(new_word)
+    adj[word] = list(neighbors)
+
+# BFS查找最短路径
+predecessor = {}
+visited = set()
+queue = deque([start])
+visited.add(start)
+predecessor[start] = None
+found = False
+
+while queue:
+    current = queue.popleft()
+    if current == end:
+        found = True
+        break
+    for neighbor in adj[current]:
+        if neighbor not in visited:
+            visited.add(neighbor)
+            predecessor[neighbor] = current
+            queue.append(neighbor)
+
+if found:
+    path = []
+    current = end
+    while current is not None:
+        path.append(current)
+        current = predecessor[current]
+    path.reverse()
+    print(' '.join(path))
+else:
+    print("NO")
+```
+
+
+
+代码运行截图 <mark>（至少包含有"Accepted"）</mark>
+
+![image-20250429201524392](C:\Users\20157\AppData\Roaming\Typora\typora-user-images\image-20250429201524392.png)
+
+
+
+### T51.N皇后
+
+backtracking, https://leetcode.cn/problems/n-queens/
+
+思路：
+
+用类似全排列的方法，位置代表行，数值代表列，可以避免位于同一行或同一列，主斜线方向行列值差相等，反斜线方向行列值和相等，把差和和存两个集合back_diag和main_diag，可以避免斜向攻击，然后dfs遍历即可。原先将prefix直接存入ans，结果出现浅复制问题（最后全被pop掉了），真的得仔细注意这种细节，错好几回了。
+
+代码：
+
+```python
+class Solution:
+    def solveNQueens(self, n: int) -> List[List[str]]:
+        ans=[]
+        col_list=[_ for _ in range(n)]
+        used=[False]*n
+        back_diag=set()
+        main_diag=set()
+
+        def dfs(row=0,prefix=[]):
+            nonlocal ans
+            if len(prefix)==n:
+                ans.append(print_format(prefix))
+                return
+            for col in col_list:
+                if not used[col] and row+col not in back_diag and col-row not in main_diag:
+                    prefix.append(col)
+                    used[col]=True
+                    back_diag.add(row+col)
+                    main_diag.add(col-row)
+                    dfs(row+1,prefix)
+                    prefix.pop()
+                    used[col]=False
+                    back_diag.remove(row+col)
+                    main_diag.remove(col-row)
+                else:
+                    continue
+            return
+
+        def print_format(cols):
+            final_ans=[]
+            for col in cols:
+                temp=['.']*n
+                temp[col]="Q"
+                final_ans.append(''.join(temp))
+            return final_ans
+        
+        dfs()
+        return ans
+```
+
+
+
+代码运行截图 <mark>（至少包含有"Accepted"）</mark>
+
+![image-20250429230623246](C:\Users\20157\AppData\Roaming\Typora\typora-user-images\image-20250429230623246.png)
+
+
+
+## 2. 学习总结和收获
+
+<mark>如果发现作业题目相对简单，有否寻找额外的练习题目，如“数算2025spring每日选做”、LeetCode、Codeforces、洛谷等网站上的题目。</mark>
+
+图写OOP类真的太折磨了，自己暂时还写不顺，希望多写点题加强一下熟练度。dfs和bfs还比较熟，问题不大。Trie类和之前的Huffman树挺有意思的，也是属于看得懂写不出，看看多写几遍能不能记下来，机考还能看看cheat sheet，笔试就不行了。
+
+
+
+
+
+
+
+# Assignment #B: 图为主
+
+Updated 2223 GMT+8 Apr 29, 2025
+
+2025 spring, Complied by <mark>陈宣之 生命科学学院</mark>
+
+
+
+> **说明：**
+>
+> 1. **解题与记录：**
+>
+>    对于每一个题目，请提供其解题思路（可选），并附上使用Python或C++编写的源代码（确保已在OpenJudge， Codeforces，LeetCode等平台上获得Accepted）。请将这些信息连同显示“Accepted”的截图一起填写到下方的作业模板中。（推荐使用Typora https://typoraio.cn 进行编辑，当然你也可以选择Word。）无论题目是否已通过，请标明每个题目大致花费的时间。
+>
+> 2. **提交安排：**提交时，请首先上传PDF格式的文件，并将.md或.doc格式的文件作为附件上传至右侧的“作业评论”区。确保你的Canvas账户有一个清晰可见的头像，提交的文件为PDF格式，并且“作业评论”区包含上传的.md或.doc附件。
+>
+> 3. **延迟提交：**如果你预计无法在截止日期前提交作业，请提前告知具体原因。这有助于我们了解情况并可能为你提供适当的延期或其他帮助。 
+>
+> 请按照上述指导认真准备和提交作业，以保证顺利完成课程要求。
+
+
+
+## 1. 题目
+
+### E07218:献给阿尔吉侬的花束
+
+bfs, http://cs101.openjudge.cn/practice/07218/
+
+思路：
+
+bfs
+
+代码：
+
+```python
+from collections import deque
+
+def find_start_end(graph):
+    sr,sc,er,ec=0,0,0,0
+    for i in range(len(graph)):
+        for j in range(len(graph[0])):
+            if graph[i][j]=='S':
+                sr,sc=i,j
+            elif graph[i][j]=='E':
+                er,ec=i,j
+    return sr,sc,er,ec
+
+def bfs(graph,sr,sc,er,ec):
+    q=deque(((sr,sc,0),))
+    inq=set()
+    inq.add((sr,sc))
+    while q:
+        x,y,step=q.popleft()
+        if x==er and y==ec:
+            return step
+        for dx,dy in [(0,1),(0,-1),(1,0),(-1,0)]:
+            nx,ny=x+dx,y+dy
+            if 0<=nx<len(graph) and 0<=ny<len(graph[0]) and graph[nx][ny]!='#' and (nx,ny) not in inq:
+                inq.add((nx,ny))
+                q.append((nx,ny,step+1))
+    return "oop!"
+
+def main():
+    t=int(input())
+    for i in range(t):
+        n,m=map(int,input().split())
+        graph=[]
+        for _ in range(n):
+            graph.append(list(input()))
+        sr,sc,er,ec=find_start_end(graph)
+        print(bfs(graph,sr,sc,er,ec))
+
+if __name__=="__main__":
+    main()
+```
+
+
+
+代码运行截图 <mark>（至少包含有"Accepted"）</mark>
+
+![image-20250503171124736](C:\Users\20157\AppData\Roaming\Typora\typora-user-images\image-20250503171124736.png)
+
+
+
+### M3532.针对图的路径存在性查询I
+
+disjoint set, https://leetcode.cn/problems/path-existence-queries-in-a-graph-i/
+
+思路：
+
+复习一下并查集
+
+代码：
+
+```python
+class Solution:
+    def pathExistenceQueries(self, n: int, nums: List[int], maxDiff: int, queries: List[List[int]]) -> List[bool]:
+        import bisect
+        parent=list(range(n))
+        def find(x):
+            if parent[x]!=x:
+                parent[x]=find(parent[x])
+            return parent[x]
+        def union(x,y):
+            px,py=find(x),find(y)
+            if px!=py:
+                px,py=max(px,py),min(px,py)
+                parent[px]=py
+        
+        def build_disjoint_set(nums,maxDiff):
+            n=len(nums)
+            for i in range(n-1):
+                if nums[i+1]-nums[i]<=maxDiff:
+                    union(i,i+1)
+        
+        def query(u,v):
+            if find(u)==find(v):
+                return True
+            else:
+                return False
+        
+        build_disjoint_set(nums,maxDiff)
+        answer=[query(i,j) for i,j in queries]
+        return answer
+```
+
+
+
+代码运行截图 <mark>（至少包含有"Accepted"）</mark>
+
+![image-20250504153908015](C:\Users\20157\AppData\Roaming\Typora\typora-user-images\image-20250504153908015.png)
+
+
+
+### M22528:厚道的调分方法
+
+binary search, http://cs101.openjudge.cn/practice/22528/
+
+思路：
+
+二分查找b值，降序后判断3/5位的数是否>=85
+
+代码：
+
+```python
+def score_changer(score,b):
+    a=b/1000000000
+    return score*a+1.1**(score*a)
+
+def judge(scores):
+    scores.sort(reverse=True)
+    n=len(scores)
+    a=(n*3-1)//5
+    if scores[a]>=85:
+        return True
+    else:
+        return False
+
+def main():
+    scores=list(map(float,input().split()))
+    lft,rgt=0,1000000000
+    while lft<=rgt:
+        mid=(lft+rgt)//2
+        if judge(list(map(lambda x:score_changer(x,mid),scores))):
+            rgt=mid-1
+        else:
+            lft=mid+1
+    print(lft)
+
+if __name__=='__main__':
+    main()
+```
+
+
+
+代码运行截图 <mark>（至少包含有"Accepted"）</mark>
+
+
+
+
+
+### Msy382: 有向图判环 
+
+dfs, https://sunnywhy.com/sfbj/10/3/382
+
+思路：
+
+用邻接表建图，然后遍历每个点dfs，visited的跳过，temp存储已经过的节点，若有节点再一次出现则成环
+
+代码：
+
+```python
+from collections import defaultdict
+class Graph:
+    def __init__(self):
+        self.graph=defaultdict(list)
+
+    def addEdge(self,u,v):
+        self.graph[u].append(v)
+
+def dfs(g,node,temp):
+    global visited
+    visited[node]=True
+    for next in g.graph[node]:
+        if next in temp:
+            return True
+        if dfs(g,next,temp+[next]):
+            return True
+    return False
+
+g=Graph()
+n,m=map(int,input().split())
+for _ in range(m):
+    u,v=map(int,input().split())
+    g.addEdge(u,v)
+
+judge=False
+visited=[False]*n
+for i in range(n):
+    if not visited[i]:
+        if dfs(g,i,[i]):
+            judge=True
+            break
+if judge:
+    print("Yes")
+else:
+    print("No")
+
+```
+
+
+
+代码运行截图 <mark>（至少包含有"Accepted"）</mark>
+
+![image-20250504170313431](C:\Users\20157\AppData\Roaming\Typora\typora-user-images\image-20250504170313431.png)
+
+
+
+### M05443:兔子与樱花
+
+Dijkstra, http://cs101.openjudge.cn/practice/05443/
+
+思路：
+
+djikstra，除了total_dist之外，还存了path和step_dist记录路径和每一步的距离（开始写dfs习惯了加了inq导致WA，但Dijkstra特点就是找到距离更短的路径后更新该点，允许多次走到该点）
+
+代码：
+
+```python
+from collections import defaultdict
+import heapq
+class Graph:
+    def __init__(self):
+        self.graph=defaultdict(dict)
+
+    def addEdge(self,location1,location2,distance):
+        self.graph[location1][location2]=distance
+        self.graph[location2][location1]=distance
+
+    def dijkstra(self,start,end):
+        q=[(0,start,[],[])]
+        while q:
+            total_dist,curr,path,step_dist=heapq.heappop(q)
+            if curr==end:
+                return path,step_dist
+            for neighbor,dist in self.graph[curr].items():
+                new_total_dist=total_dist+dist
+                new_path=path+[neighbor]
+                new_step_dist=step_dist+[dist]
+                heapq.heappush(q,(new_total_dist,neighbor,new_path,new_step_dist))
+
+def main():
+    g=Graph()
+    p=int(input())
+    for i in range(p):
+        location=input()
+        g.graph[location]={}
+    q=int(input())
+    for i in range(q):
+        location1,location2,distance=input().split()
+        g.addEdge(location1,location2,int(distance))
+    r=int(input())
+    for i in range(r):
+        start,end=input().split()
+        path,step_dist=g.dijkstra(start,end)
+        ans=start
+        for _ in range(len(path)):
+            ans+='->('+str(step_dist[_])+')->'+path[_]
+        print(ans)
+
+if __name__=='__main__':
+    main()
+
+
+```
+
+
+
+代码运行截图 <mark>（至少包含有"Accepted"）</mark>
+
+![image-20250504223127135](C:\Users\20157\AppData\Roaming\Typora\typora-user-images\image-20250504223127135.png)
+
+
+
+### T28050: 骑士周游
+
+dfs, http://cs101.openjudge.cn/practice/28050/
+
+思路：
+
+
+
+代码：
+
+```python
+最简的dfs写法：超时
+def dfs(start,visited,cnt):
+    global size
+    if cnt==size*size:
+        return True
+    x,y=start
+    for dx,dy in [(1,2),(2,1),(-1,2),(-2,1),(1,-2),(2,-1),(-1,-2),(-2,-1)]:
+        nx,ny=x+dx,y+dy
+        if 0<=nx<size and 0<=ny<size and not visited[nx][ny]:
+            visited[nx][ny]=True
+            if dfs((nx,ny),visited,cnt+1):
+                return True
+            visited[nx][ny]=False
+    return False
+
+size=int(input())
+start=tuple(map(int,input().split()))
+visited=[[False for _ in range(size)] for _ in range(size)]
+if dfs(start,visited,1):
+    print("success")
+else:
+    print("fail")
+```
+
+
+
+```
+从d老师（DeepSeek）学到Warnsdorff规则，优先选择下一步可能性最少的路径
+directions = [(1, 2), (2, 1), (-1, 2), (-2, 1),
+              (1, -2), (2, -1), (-1, -2), (-2, -1)]
+
+def dfs(start, visited, cnt):
+    global size
+    if cnt == size * size:
+        return True
+    x, y = start
+
+    moves = []
+    for dx, dy in directions:
+        nx = x + dx
+        ny = y + dy
+        if 0 <= nx < size and 0 <= ny < size and not visited[nx][ny]:
+            count = 0
+            for ddx, ddy in directions:
+                nnx = nx + ddx
+                nny = ny + ddy
+                if 0 <= nnx < size and 0 <= nny < size and not visited[nnx][nny]:
+                    count += 1
+            moves.append((count, nx, ny))
+    # 按count升序排序
+    moves.sort()
+    for count, nx, ny in moves:
+        visited[nx][ny] = True
+        if dfs((nx, ny), visited, cnt + 1):
+            return True
+        visited[nx][ny] = False
+    return False
+
+size = int(input())
+sr, sc = map(int, input().split())
+visited = [[False] * size for _ in range(size)]
+visited[sr][sc] = True
+if dfs((sr, sc), visited, 1):
+    print("success")
+else:
+    print("fail")
+```
+
+代码运行截图 <mark>（至少包含有"Accepted"）</mark>
+
+![image-20250505012249562](C:\Users\20157\AppData\Roaming\Typora\typora-user-images\image-20250505012249562.png)
+
+
+
+## 2. 学习总结和收获
+
+<mark>如果发现作业题目相对简单，有否寻找额外的练习题目，如“数算2025spring每日选做”、LeetCode、Codeforces、洛谷等网站上的题目。</mark>
+
+依旧是搜索为主，dfs、bfs以及Dijkstra，模版背的挺熟了，不同题目细节上有些不一样，debug还是花了些功夫。第二题复习下并查集，上学期一知半解的。最后一题套模板会超时，新学习了一下Warnsdorff规则，好理解，但我确实是想不出来。五一一转眼就过一半了，今天把作业写完，之后几天可以追追每日一练，加油！。
+
+
+
+
+
+
+
+# Assignment #C: 202505114 Mock Exam
+
+Updated 1518 GMT+8 May 14, 2025
+
+2025 spring, Complied by <mark>陈宣之 生命科学学院</mark>
+
+
+
+> **说明：**
+>
+> 1. **⽉考**：AC<mark>5</mark> 。考试题⽬都在“题库（包括计概、数算题目）”⾥⾯，按照数字题号能找到，可以重新提交。作业中提交⾃⼰最满意版本的代码和截图。
+>
+> 2. **解题与记录：**
+>
+>    对于每一个题目，请提供其解题思路（可选），并附上使用Python或C++编写的源代码（确保已在OpenJudge， Codeforces，LeetCode等平台上获得Accepted）。请将这些信息连同显示“Accepted”的截图一起填写到下方的作业模板中。（推荐使用Typora https://typoraio.cn 进行编辑，当然你也可以选择Word。）无论题目是否已通过，请标明每个题目大致花费的时间。
+>
+> 3. **提交安排：**提交时，请首先上传PDF格式的文件，并将.md或.doc格式的文件作为附件上传至右侧的“作业评论”区。确保你的Canvas账户有一个清晰可见的头像，提交的文件为PDF格式，并且“作业评论”区包含上传的.md或.doc附件。
+>
+> 4. **延迟提交：**如果你预计无法在截止日期前提交作业，请提前告知具体原因。这有助于我们了解情况并可能为你提供适当的延期或其他帮助。 
+>
+> 请按照上述指导认真准备和提交作业，以保证顺利完成课程要求。
+
+
+
+## 1. 题目
+
+### E06364: 牛的选举
+
+http://cs101.openjudge.cn/practice/06364/
+
+思路：
+
+两次sort
+
+代码：
+
+```python
+n,k=map(int,input().split())
+cows=[]
+for _ in range(n):
+    cows.append([_]+list(map(int,input().split())))
+cows.sort(key=lambda x:x[1],reverse=True)
+nxt=cows[:k]
+nxt.sort(key=lambda x:x[2],reverse=True)
+print(nxt[0][0]+1)
+```
+
+
+
+代码运行截图 <mark>（至少包含有"Accepted"）</mark>
+
+![image-20250515183441610](C:\Users\20157\AppData\Roaming\Typora\typora-user-images\image-20250515183441610.png)
+
+
+
+### M04077: 出栈序列统计
+
+http://cs101.openjudge.cn/practice/04077/
+
+思路：
+
+dfs，每一步选择append(curr<=n)或pop(stack非空)，全部出栈(len(out)==n)结束
+
+代码：
+
+```python
+n=int(input())
+ans=0
+def dfs(curr,stack=[],out=[]):
+    global ans
+    if len(out)==n:
+        ans+=1
+        return
+    if curr<=n:
+        dfs(curr+1,stack+[curr],out)
+    if stack:
+        top=stack.pop()
+        dfs(curr,stack,out+[top])
+dfs(1)
+print(ans)
+```
+
+
+
+代码运行截图 <mark>（至少包含有"Accepted"）</mark>
+
+![image-20250515183657702](C:\Users\20157\AppData\Roaming\Typora\typora-user-images\image-20250515183657702.png)
+
+
+
+### M05343:用队列对扑克牌排序
+
+http://cs101.openjudge.cn/practice/05343/
+
+思路：
+
+入队后按顺序出队
+
+代码：
+
+```python
+from collections import deque
+n=int(input())
+queues=[deque() for _ in range(9)]
+cards=list(map(str,input().split()))
+for card in cards:
+    y=int(card[1])
+    queues[y-1].append(card)
+for i in range(9):
+    print('Queue',i+1,':',' '.join(queues[i]),sep='')
+
+flowers=[deque() for _ in range(4)]
+for q in queues:
+    while q:
+        cur=q.popleft()
+        flower=ord(cur[0])-ord('A')
+        flowers[flower].append(cur)
+for i in range(4):
+    print('Queue',chr(i+ord('A')),':',' '.join(flowers[i]),sep='')
+ans=[]
+for q in flowers:
+    while q:
+         cur=q.popleft()
+         ans.append(cur)
+print(*ans)
+```
+
+
+
+代码运行截图 <mark>（至少包含有"Accepted"）</mark>
+
+![image-20250515183754427](C:\Users\20157\AppData\Roaming\Typora\typora-user-images\image-20250515183754427.png)
+
+
+
+### M04084: 拓扑排序
+
+http://cs101.openjudge.cn/practice/04084/
+
+思路：
+
+模板题
+
+代码：
+
+```python
+v,a=map(int,input().split())
+adj=[[] for _ in range(v)]
+ind=[0]*v
+for _ in range(a):
+    u,w=map(int,input().split())
+    adj[u-1].append(w-1)
+    ind[w-1]+=1
+
+ans=[]
+sorted_ind=[[ind[index],index] for index in range(v)]
+sorted_ind.sort()
+while sorted_ind[0][0]!=10**9:
+    indegee,cur=sorted_ind[0]
+    ans.append(cur)
+    ind[cur]=10**9
+    for nxt in adj[cur]:
+        ind[nxt]-=1
+    sorted_ind=[[ind[index],index] for index in range(v)]
+    sorted_ind.sort()
+for i in ans:
+    print('v',i+1,sep='',end=' ')
+```
+
+
+
+代码运行截图 <mark>（至少包含有"Accepted"）</mark>
+
+![image-20250515184009750](C:\Users\20157\AppData\Roaming\Typora\typora-user-images\image-20250515184009750.png)
+
+
+
+### M07735:道路
+
+Dijkstra, http://cs101.openjudge.cn/practice/07735/
+
+思路：
+
+1.特殊的Dijkstra，除了要找到最短路径，还有路费限制，因此建立二维数组（变成dp了？），记录路费为 j 时到达（i+1）城市的最短距离，初始化后用heap进行bfs（常规Dijkstra），满足条件的节点更新dist并加入q，最后找到dist数组中n城市所有可能路费中的距离最小值，float('inf')表示没有满足条件的路径，print(-1)
+
+2.机考时写的，简单的bfs加heapq，但是机考时用的字典建邻接表，超时或超内存
+
+代码：
+
+```python
+1.
+import heapq
+
+k = int(input())
+n = int(input())
+r = int(input())
+
+# 修正：使用列表存储所有边
+adj = [[] for _ in range(n)]
+for _ in range(r):
+    s, d, l, t = map(int, input().split())
+    adj[s - 1].append((d - 1, l, t))  # 存储为 (终点, 长度, 费用)
+
+q = [(0, 0, 0)]  # (距离, 费用, 当前城市)
+dist = [[float('inf')] * (k + 1) for _ in range(n)]  # dist[i][j]表示到城市i，花费为j的最小距离
+dist[0][0] = 0
+
+while q:
+    dis, cost, loc = heapq.heappop(q)
+
+    # 跳过过时的状态
+    if dis > dist[loc][cost]:
+        continue
+
+    # 处理所有可能的路径，而不是找到就立即返回
+    for nxt, step_dis, step_cost in adj[loc]:
+        new_cost = cost + step_cost
+        if new_cost > k:
+            continue
+        new_dis = dis + step_dis
+        if new_dis < dist[nxt][new_cost]:
+            dist[nxt][new_cost] = new_dis
+            heapq.heappush(q, (new_dis, new_cost, nxt))
+
+# 检查所有可能的费用情况，找到最短路径
+ans = float('inf')
+for t in range(k + 1):
+    if dist[n - 1][t] < ans:
+        ans = dist[n - 1][t]
+
+print(ans if ans != float('inf') else -1)
+```
+
+```
+2.
+import heapq
+k=int(input())
+n=int(input())
+r=int(input())
+adj=[[] for i in range(n)]
+for i in range(r):
+    s,d,l,t=map(int,input().split())
+    adj[s-1].append((d-1,l,t))
+
+q=[(0,0,0)]
+while q:
+    dis,cost,loc=heapq.heappop(q)
+    if loc==n-1 and cost<=k:
+        print(dis)
+        break
+    for nxt,step_dis,step_cost in adj[loc]:
+        if cost+step_cost>k:
+            continue
+        heapq.heappush(q,(dis+step_dis,cost+step_cost,nxt))
+else:
+    print(-1)
+```
+
+代码运行截图 <mark>（至少包含有"Accepted"）</mark>
+
+![image-20250515194335594](C:\Users\20157\AppData\Roaming\Typora\typora-user-images\image-20250515194335594.png)
+
+![image-20250515205434701](C:\Users\20157\AppData\Roaming\Typora\typora-user-images\image-20250515205434701.png)
+
+### T24637:宝藏二叉树
+
+dp, http://cs101.openjudge.cn/practice/24637/
+
+思路：
+
+dfs，judge记录父节点的状态，父节点不挖（judge=0），则子节点可挖可不挖（0/1），取最值，父节点挖（1），则节点只能不挖（0），继续搜索两子节点（node*2+1，node*2+2）[完全二叉树]
+
+代码：
+
+```python
+n=int(input())
+nodes=list(map(int,input().split()))
+def dfs(node,judge):
+    if node>n-1:
+        return 0
+    if judge==0:
+        return max(dfs(node*2+1,1)+dfs(node*2+2,1)+nodes[node],dfs(node*2+1,0)+dfs(node*2+2,0))
+    if judge==1:
+        return dfs(node*2+1,0)+dfs(node*2+2,0)
+print(dfs(0,0))
+```
+
+
+
+代码运行截图 <mark>（至少包含有"Accepted"）</mark>
+
+![image-20250515195032559](C:\Users\20157\AppData\Roaming\Typora\typora-user-images\image-20250515195032559.png)
+
+
+
+## 2. 学习总结和收获
+
+<mark>如果发现作业题目相对简单，有否寻找额外的练习题目，如“数算2025spring每日选做”、LeetCode、Codeforces、洛谷等网站上的题目。</mark>
+
+AC5，本人比较满意，写题颇有成效，但是看到群里都是些一个多小时AK的大佬还是比较震惊。
+
+数组排序，栈，队列排序，图的拓扑排序、最短路径，树的dfs遍历，这次月考几乎把所有数据结构过了一遍，个人感觉整体难度不大，就第五题比较难，但是写的过程当中还是经常会出一些小错误需要debug。
+
+对Dijkstra的理解还停留在上学期bfs的改进，可能还要在仔细看看课件，不然一有变化就无从下手，考试的时候完全套bfs模板，先超时后超内存，问AI发现有多条边起终点相同，因此不能用字典建邻接表。回来后看题解说实话不是太能理解，AI的答案比较好理解。
+
+
+
+
+
+
+# Assignment #D: 图 & 散列表
+
+Updated 2042 GMT+8 May 20, 2025
+
+2025 spring, Complied by <mark>陈宣之 生命科学学院</mark>
+
+
+
+> **说明：**
+>
+> 1. **解题与记录：**
+>
+>    对于每一个题目，请提供其解题思路（可选），并附上使用Python或C++编写的源代码（确保已在OpenJudge， Codeforces，LeetCode等平台上获得Accepted）。请将这些信息连同显示“Accepted”的截图一起填写到下方的作业模板中。（推荐使用Typora https://typoraio.cn 进行编辑，当然你也可以选择Word。）无论题目是否已通过，请标明每个题目大致花费的时间。
+>
+> 2. **提交安排：**提交时，请首先上传PDF格式的文件，并将.md或.doc格式的文件作为附件上传至右侧的“作业评论”区。确保你的Canvas账户有一个清晰可见的头像，提交的文件为PDF格式，并且“作业评论”区包含上传的.md或.doc附件。
+>
+> 3. **延迟提交：**如果你预计无法在截止日期前提交作业，请提前告知具体原因。这有助于我们了解情况并可能为你提供适当的延期或其他帮助。 
+>
+> 请按照上述指导认真准备和提交作业，以保证顺利完成课程要求。
+
+
+
+## 1. 题目
+
+### M17975: 用二次探查法建立散列表
+
+http://cs101.openjudge.cn/practice/17975/
+
+<mark>需要用这样接收数据。因为输入数据可能分行了，不是题面描述的形式。OJ上面有的题目是给C++设计的，细节考虑不周全。</mark>
+
+```python
+import sys
+input = sys.stdin.read
+data = input().split()
+index = 0
+n = int(data[index])
+index += 1
+m = int(data[index])
+index += 1
+num_list = [int(i) for i in data[index:index+n]]
+```
+
+
+
+思路：
+
+
+
+代码：
+
+```python
+import sys
+input=sys.stdin.read
+data=input().split()
+ptr=0
+n=int(data[ptr])
+ptr+=1
+m=int(data[ptr])
+ptr+=1
+num_list=list(map(int,data[ptr:ptr+n]))
+ht=[0]*m
+ans=[]
+for cur in num_list:
+    loc=cur%m
+    k=1
+    if ht[loc]==cur:
+        ans.append(loc)
+        continue
+    while ht[loc]:
+        switch=((loc+k*k)%m)
+        if not ht[switch]:
+            loc=switch
+            break
+        switch=((loc-k*k)%m)
+        if not ht[switch]:
+            loc=switch
+            break
+        k+=1
+    ht[loc]=cur
+    ans.append(loc)
+print(*ans)
+```
+
+
+
+代码运行截图 <mark>（至少包含有"Accepted"）</mark>
+
+![image-20250522114926728](C:\Users\20157\AppData\Roaming\Typora\typora-user-images\image-20250522114926728.png)
+
+
+
+### M01258: Agri-Net
+
+MST, http://cs101.openjudge.cn/practice/01258/
+
+思路：
+
+
+
+代码：
+
+```python
+import sys,heapq
+data=sys.stdin.read().split()
+ptr=0
+while ptr<len(data):
+    n=int(data[ptr])
+    ptr+=1
+    matrix=[[int(data[ptr+i*n+j]) for j in range(n)] for i in range(n)]
+    ptr+=n*n
+    res=0
+    dist=[float('inf') for i in range(n)]
+    dist[0]=0
+    visited=set()
+    visited.add(0)
+    for _ in range(n-1):
+        heap=[]
+        for cur in visited:
+            for nxt in range(n):
+                if nxt not in visited:
+                    heapq.heappush(heap,(matrix[cur][nxt],cur,nxt))
+        dis,cur,nxt=heapq.heappop(heap)
+        res+=dis
+        dist[nxt]=dis
+        visited.add(nxt)
+    print(res)
+```
+
+
+
+代码运行截图 <mark>（至少包含有"Accepted"）</mark>
+
+![image-20250522115059911](C:\Users\20157\AppData\Roaming\Typora\typora-user-images\image-20250522115059911.png)
+
+
+
+### M3552.网络传送门旅游
+
+bfs, https://leetcode.cn/problems/grid-teleportation-traversal/
+
+思路：
+
+gates存传送门，键为字母，值为列表存坐标。bfs，遇到字母将所有传送门坐标加入
+
+代码：
+
+```python
+class Solution:
+    def minMoves(self, matrix: List[str]) -> int:
+        m=len(matrix)
+        n=len(matrix[0])
+        gates=defaultdict(list)
+        for i in range(m):
+            for j in range(n):
+                if matrix[i][j]!='.' and matrix[i][j]!='#':
+                    gates[matrix[i][j]].append((i,j))
+
+        q=deque()
+        inq=set()
+        q.append((0,0,0))
+        inq.add((0,0))
+        if matrix[0][0]!='.':
+            for gate in gates[matrix[0][0]]:
+                if (0,0)==gate:
+                    continue
+                if gate not in inq:
+                    q.append((0,gate[0],gate[1]))
+                    inq.add(gate)
+        
+        while q:
+            step,x,y=q.popleft()
+            if (x,y)==(m-1,n-1):
+                return step
+        
+            for dx,dy in [(0,1),(0,-1),(1,0),(-1,0)]:
+                nx,ny=x+dx,y+dy
+                if 0<=nx<m and 0<=ny<n and matrix[nx][ny]!='#' and (nx,ny) not in inq:
+                    q.append((step+1,nx,ny))
+                    inq.add((nx,ny))
+                    if matrix[nx][ny]!='.':
+                        for gate in gates[matrix[nx][ny]]:
+                            if (nx,ny)==gate:
+                                continue
+                            if gate not in inq:
+                                q.append((step+1,gate[0],gate[1]))
+                                inq.add(gate)
+        return -1
+                    
+```
+
+
+
+代码运行截图 <mark>（至少包含有"Accepted"）</mark>
+
+![image-20250522115423634](C:\Users\20157\AppData\Roaming\Typora\typora-user-images\image-20250522115423634.png)
+
+
+
+### M787.K站中转内最便宜的航班
+
+Bellman Ford, https://leetcode.cn/problems/cheapest-flights-within-k-stops/
+
+思路：
+
+
+
+代码：
+
+```python
+class Solution:
+    def findCheapestPrice(self, n: int, flights: List[List[int]], src: int, dst: int, k: int) -> int:
+        dist=[float('inf')]*n
+        dist[src]=0
+        for _ in range(k+1):
+            temp=dist.copy()
+            for from_loc,to_loc,cost in flights:
+                temp[to_loc]=min(temp[to_loc],dist[from_loc]+cost)
+            dist=temp.copy()
+        if dist[dst]==float('inf'):
+            return -1
+        else:
+            return dist[dst]
+```
+
+
+
+代码运行截图 <mark>（至少包含有"Accepted"）</mark>
+
+![image-20250522123645367](C:\Users\20157\AppData\Roaming\Typora\typora-user-images\image-20250522123645367.png)
+
+
+
+### M03424: Candies
+
+Dijkstra, http://cs101.openjudge.cn/practice/03424/
+
+思路：
+
+a→b，权重为c的边表示差分约束b-a<=c，边连接为路径代表不等式的相加。用Dijkstra找到从1到n最短的边cost，表示n-1<=cost，即是1和n两者最严格的差分约束，因此在该约束下n-1的最大值即为cost
+
+代码：
+
+```python
+import sys,heapq
+data=sys.stdin.read().split()
+ptr=0
+n,m=int(data[ptr]),int(data[ptr+1])
+ptr+=2
+adj=[[] for i in range(n)]
+for i in range(m):
+    a,b,weight=int(data[ptr])-1,int(data[ptr+1])-1,int(data[ptr+2])
+    adj[a].append((b,weight))  #b-a<=weight to solve (n)-(1)<=x
+    ptr+=3
+q=[(0,0)]
+inq=set()
+while q:
+    cost,child=heapq.heappop(q)
+    inq.add(child)
+    if child==n-1:
+        print(cost)
+        break
+    for nxt,weight in adj[child]:
+        if nxt not in inq:
+            heapq.heappush(q,(cost+weight,nxt))
+```
+
+
+
+代码运行截图 <mark>（至少包含有"Accepted"）</mark>
+
+![image-20250522192853256](C:\Users\20157\AppData\Roaming\Typora\typora-user-images\image-20250522192853256.png)
+
+
+
+### M22508:最小奖金方案
+
+topological order, http://cs101.openjudge.cn/practice/22508/
+
+思路：
+
+拓扑排序，但是通过出度排序，初始化bonus为100，将出度为0的加入队列，出队的u的bonus取其子节点bonus最大值+1，更新父节点出度，若父节点出度为0则入队
+
+代码：
+
+```python
+from collections import deque
+import sys
+data=sys.stdin.read().split()
+ptr=0
+n=int(data[ptr])
+ptr+=1
+m=int(data[ptr])
+ptr+=1
+adj=[[] for _ in range(n)]
+rev_adj=[[] for _ in range(n)]
+od=[0]*n
+bonus=[100]*n
+for i in range(m):
+    u,v=int(data[ptr]),int(data[ptr+1])
+    ptr+=2
+    adj[u].append(v)
+    rev_adj[v].append(u)
+    od[u]+=1
+
+q=deque()
+for i in range(n):
+    if od[i]==0:
+        q.append(i)
+
+while q:
+    u=q.popleft()
+    bonus[u]=max(bonus[u],max(bonus[v]+1 for v in adj[u]) if adj[u] else 0)
+    for v in rev_adj[u]:
+        od[v]-=1
+        if od[v]==0:
+            q.append(v)
+
+print(sum(bonus))
+```
+
+
+
+代码运行截图 <mark>（至少包含有"Accepted"）</mark>
+
+![image-20250523161705030](C:\Users\20157\AppData\Roaming\Typora\typora-user-images\image-20250523161705030.png)
+
+
+
+## 2. 学习总结和收获
+
+<mark>如果发现作业题目相对简单，有否寻找额外的练习题目，如“数算2025spring每日选做”、LeetCode、Codeforces、洛谷等网站上的题目。</mark>
+
+这周的作业都是每日选做的题，本来想集中找个时间写，结果发现都做过了hhh。第一题本来是简单的实现，但当时死活想不到到重复出现的数，写的挺头大；第二、四题是最小生成树和Bellman-Ford模板题；Candies第一次见还挺巧妙的，把差分约束变成图变成最短路径题，标签Dijkstra还以为标错了；最后一题是逆向的拓扑排序，正着排似乎不太可行。
+
+图的每日选做上周写完了，准备复习一下数和链表（怎么就要期末了qwq）
+
+
+
+
+
